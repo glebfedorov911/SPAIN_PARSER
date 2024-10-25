@@ -67,10 +67,76 @@ async def fifth_page(page):
     await page.evaluate("JAVASCRIPT:selectedIdP('AFIRMA');idpRedirect.submit();")
 
 async def sixth_page(page):
-    await asyncio.sleep(10)
     print("сейчас нажму")
+    await asyncio.sleep(random.uniform(10, 15))
     keyboard.press_and_release('enter')
     print("нажал")
+
+async def seventh_page(page, code, name, country): 
+    await page.wait_for_selector("#txtIdCitado")
+    await asyncio.sleep(random.uniform(3, 5))
+    nie = await page.query_selector("#txtIdCitado")
+    await nie.fill(code)
+
+    nombre = await page.query_selector("#txtDesCitado")
+    await asyncio.sleep(random.uniform(3, 5))
+    await nombre.fill(name)
+
+    form = await page.query_selector("#txtPaisNac")
+    options = await page.query_selector_all("#txtPaisNac option")
+    for option in options:
+        print(await option.inner_text())
+        if country in await option.inner_text():
+            await asyncio.sleep(random.uniform(3, 5))
+            await form.select_option(await option.get_attribute("value"))
+            break
+    
+    await asyncio.sleep(random.uniform(3, 5))
+    await page.evaluate("envia()")
+
+async def eightth_page(page):
+    await page.wait_for_selector("#btnEnviar")
+    await asyncio.sleep(random.uniform(3, 5))
+    await page.click("#btnEnviar")
+
+async def nineth_page(page, phone, email1, email2):
+    await page.wait_for_selector(".cajapeque") 
+    phone = await page.query_selector(".cajapeque")
+    await phone.fill(phone)
+    await asyncio.sleep(random.uniform(3, 5))
+        
+    emailUNO = await page.query_selector("emailUNO")
+    await emailUNO.fill(email1)
+    await asyncio.sleep(random.uniform(3, 5))
+
+    emailDOS = await page.query_selector("emailDOS")
+    await emailDOS.fill(email2)
+    await asyncio.sleep(random.uniform(3, 5))
+
+    await page.evaluate("enviar()")
+
+async def tenth_page(page, num):
+    await page.wait_for_selector("#cita1")
+    await asyncio.sleep(random.uniform(5, 8))
+    await page.click(f"#cita{num}")
+    await asyncio.sleep(random.uniform(5, 8))
+    await page.click("#btnSiguiente")
+    await asyncio.sleep(random.uniform(5, 8))
+    await page.click(".btn.btn-default")
+
+async def eleventh_page(page):
+    await page.wait_for_selector("#chkTotal")
+    await asyncio.sleep(random.uniform(5, 8))
+    await page.click(f"#chkTotal")
+    await asyncio.sleep(random.uniform(5, 8))
+    await page.click("#enviarCorreo")
+    await asyncio.sleep(random.uniform(5, 8))
+    await page.evaluate("envia()")
+
+async def twelveth_page(page):
+    await page.wait_for_selector("#btnSalir")
+    await asyncio.sleep(random.uniform(5, 8))
+    await page.click(f"#btnSalir")
 
 async def main():
     async with async_playwright() as p:
@@ -108,8 +174,14 @@ async def main():
         await fourth_page(page)
         await fifth_page(page)
         await sixth_page(page)
+        await seventh_page(page, "Y8800766S", "ADA DAS", "ARGELIA")
+        await eightth_page(page)
+        await nineth_page(page, "612345658", "t2est@gmail.com", "t2est@gmail.com")
+        await tenth_page(page, 1)
+        await eleventh_page(page)
+        await twelveth_page(page)
 
-        await asyncio.sleep(5011)
+        await asyncio.sleep(1000)
         await browser.close()
 
 asyncio.run(main())
