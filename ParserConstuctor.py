@@ -8,33 +8,10 @@ from playwright.async_api import async_playwright, TimeoutError
 class ParserConstructor:
     def __init__(self, host=None, port=None, login=None, password=None):
         '''Заполнить эти поля, если есть прокси'''
-        if host:
-            self.browser = await p.chromium.launch_persistent_context(
-                headless=False,
-                proxy={
-                    "server": f"{host}:{port}",
-                    "username": login,
-                    "password": password,
-                },
-                args=[
-                    "--ignore-certificate-errors",
-                    "--allow-insecure-localhost",
-                    "--client-certificate=certY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem",
-                    "--client-key=privY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem"
-                ]
-            )
-        else:
-            self.browser = await p.chromium.launch_persistent_context(
-                headless=False,
-                args=[
-                    "--ignore-certificate-errors",
-                    "--allow-insecure-localhost",
-                    "--client-certificate=certY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem",
-                    "--client-key=privY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem"
-                ]
-            )
-
-        self.page = await self.browser.new_page()
+        self.host = host
+        self.port = port
+        self.login = login
+        self.password = password
 
     async def button_click(self, selector: str, _id: int = None):
         '''
@@ -136,7 +113,38 @@ class ParserConstructor:
         except Exception as e:
             print("Ошибка!", e)
             await self.browser.close()
-        
+
+    async def start(self):
+        '''
+        Перед написанием всей программы запускаем этот метод, для открытия эмулятора веб версии
+        '''
+        if self.host:
+            self.browser = await p.chromium.launch_persistent_context(
+                headless=False,
+                proxy={
+                    "server": f"{self.host}:{self.port}",
+                    "username": self.login,
+                    "password": self.password,
+                },
+                args=[
+                    "--ignore-certificate-errors",
+                    "--allow-insecure-localhost",
+                    "--client-certificate=certY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem",
+                    "--client-key=privY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem"
+                ]
+            )
+        else:
+            self.browser = await p.chromium.launch_persistent_context(
+                headless=False,
+                args=[
+                    "--ignore-certificate-errors",
+                    "--allow-insecure-localhost",
+                    "--client-certificate=certY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem",
+                    "--client-key=privY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem"
+                ]
+            )
+        self.page = await self.browser.new_page()
+
     async def finish(self):
         '''
         После написания всей программы запускаем этот метод, для закрытия эмулятора веб версии
