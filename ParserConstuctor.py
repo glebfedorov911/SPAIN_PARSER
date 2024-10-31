@@ -28,9 +28,9 @@ class ParserConstructor:
             await button.click()
             print("Все прошло успешно! Переходим на следующую страницу")
         except TimeoutError as te:
-            await handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
+            await self.handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
         except Exception as e:
-            await handle_error("Ошибка!", e)
+            await self.handle_error("Ошибка!", e)
 
     async def select_option(self, option_value, form_selector, option_selector = None):
         '''
@@ -56,9 +56,9 @@ class ParserConstructor:
                 print("Неверно указан селектор, форма не заполнена")
                 raise Exception
         except TimeoutError as te:
-            await handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
+            await self.handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
         except Exception as e:
-            await handle_error("Ошибка!", e)
+            await self.handle_error("Ошибка!", e)
 
     async def alternative_for_next_page(self, _eval):
         '''
@@ -71,9 +71,9 @@ class ParserConstructor:
             await self.page.evaluate(_eval)
             print("Успешно выполнен переход")
         except TimeoutError as te:
-            await handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
+            await self.handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
         except Exception as e:
-            await handle_error("Ошибка!", e)
+            await self.handle_error("Ошибка!", e)
 
     async def click_enter_on_page(self):
         '''
@@ -84,9 +84,9 @@ class ParserConstructor:
             keyboard.press_and_release('enter')
             print("Успешно выполнено нажатие!")
         except TimeoutError as te:
-            await handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
+            await self.handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
         except Exception as e:
-            await handle_error("Ошибка!", e)
+            await self.handle_error("Ошибка!", e)
 
     async def fill_field(self, value_for_fill, selector):
         '''
@@ -100,9 +100,9 @@ class ParserConstructor:
             await field.fill(value_for_fill)
             print("Поле успешно заполенено")
         except TimeoutError as te:
-            await handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
+            await self.handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
         except Exception as e:
-            await handle_error("Ошибка!", e)
+            await self.handle_error("Ошибка!", e)
 
     async def start(self):
         '''
