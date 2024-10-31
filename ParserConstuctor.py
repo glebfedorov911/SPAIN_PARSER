@@ -144,7 +144,7 @@ class ParserConstructor:
             await self.browser.close()
         print("Браузер успешно закрыт")
 
-    async def handle_error(self, msg):
+    async def handle_error(self, msg, e=None):
         '''Метод для вызова ошибки и окончания работы парсера'''
-        print(msg)
+        print(f"{msg} | {str(e) if e else ''}")
         await self.finish()
