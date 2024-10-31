@@ -12,6 +12,8 @@ class ParserConstructor:
         self.port = port
         self.login = login
         self.password = password
+        self.browser = None
+        self.page = None
 
     async def button_click(self, selector: str, _id: int = None):
         '''
@@ -138,7 +140,9 @@ class ParserConstructor:
         '''
         После написания всей программы запускаем этот метод, для закрытия эмулятора веб версии / Вызывается в случае ошибки
         '''
-        await self.browser.close()
+        if self.browser:
+            await self.browser.close()
+        print("Браузер успешно закрыт")
 
     async def handle_error(self, msg):
         '''Метод для вызова ошибки и окончания работы парсера'''
