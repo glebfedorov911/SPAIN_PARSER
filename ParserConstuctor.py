@@ -22,16 +22,13 @@ class ParserConstructor:
             await self.page.wait_for_selector(selector)
             await asyncio.sleep(random.uniform(1, 5))
             buttons = await self.page.query_selector_all(selector)
-            button = buttons[-1] if not _id else button[_id-1]
+            button = buttons[-1] if not _id else buttons[_id-1]
             await button.click()
             print("Все прошло успешно! Переходим на следующую страницу")
-            await self.browser.close()
         except TimeoutError as te:
-            print("Ошибка! Превышено время ожидания прогрузки страницы!")
-            await self.browser.close()
+            await handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
         except Exception as e:
-            print("Ошибка!", e)
-            await self.browser.close()
+            await handle_error("Ошибка!", e)
 
     async def select_option(self, option_value, form_selector, option_selector = None):
         '''
@@ -55,14 +52,11 @@ class ParserConstructor:
                     break
             else:
                 print("Неверно указан селектор, форма не заполнена")
-                await self.browser.close()
                 raise Exception
         except TimeoutError as te:
-            print("Ошибка! Превышено время ожидания прогрузки страницы!")
-            await self.browser.close()
+            await handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
         except Exception as e:
-            print("Ошибка!", e)
-            await self.browser.close()
+            await handle_error("Ошибка!", e)
 
     async def alternative_for_next_page(self, _eval):
         '''
@@ -75,11 +69,9 @@ class ParserConstructor:
             await self.page.evaluate(_eval)
             print("Успешно выполнен переход")
         except TimeoutError as te:
-            print("Ошибка! Превышено время ожидания прогрузки страницы!")
-            await self.browser.close()
+            await handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
         except Exception as e:
-            print("Ошибка!", e)
-            await self.browser.close()
+            await handle_error("Ошибка!", e)
 
     async def click_enter_on_page(self):
         '''
@@ -90,11 +82,9 @@ class ParserConstructor:
             keyboard.press_and_release('enter')
             print("Успешно выполнено нажатие!")
         except TimeoutError as te:
-            print("Ошибка! Превышено время ожидания прогрузки страницы!")
-            await self.browser.close()
+            await handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
         except Exception as e:
-            print("Ошибка!", e)
-            await self.browser.close()
+            await handle_error("Ошибка!", e)
 
     async def fill_field(self, value_for_fill, selector):
         '''
@@ -104,49 +94,53 @@ class ParserConstructor:
         try:
             await self.page.wait_for_selector(selector)
             await asyncio.sleep(random.uniform(3, 5))
-            field = await page.query_selector(selector)
+            field = await self.page.query_selector(selector)
             await field.fill(value_for_fill)
             print("Поле успешно заполенено")
         except TimeoutError as te:
-            print("Ошибка! Превышено время ожидания прогрузки страницы!")
-            await self.browser.close()
+            await handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
         except Exception as e:
-            print("Ошибка!", e)
-            await self.browser.close()
+            await handle_error("Ошибка!", e)
 
     async def start(self):
         '''
         Перед написанием всей программы запускаем этот метод, для открытия эмулятора веб версии
         '''
-        if self.host:
-            self.browser = await p.chromium.launch_persistent_context(
-                headless=False,
-                proxy={
-                    "server": f"{self.host}:{self.port}",
-                    "username": self.login,
-                    "password": self.password,
-                },
-                args=[
-                    "--ignore-certificate-errors",
-                    "--allow-insecure-localhost",
-                    "--client-certificate=certY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem",
-                    "--client-key=privY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem"
-                ]
-            )
-        else:
-            self.browser = await p.chromium.launch_persistent_context(
-                headless=False,
-                args=[
-                    "--ignore-certificate-errors",
-                    "--allow-insecure-localhost",
-                    "--client-certificate=certY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem",
-                    "--client-key=privY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem"
-                ]
-            )
-        self.page = await self.browser.new_page()
+        async with async_playwright() as p:
+            if self.host:
+                self.browser = await p.chromium.launch_persistent_context(
+                    headless=False,
+                    proxy={
+                        "server": f"{self.host}:{self.port}",
+                        "username": self.login,
+                        "password": self.password,
+                    },
+                    args=[
+                        "--ignore-certificate-errors",
+                        "--allow-insecure-localhost",
+                        "--client-certificate=certY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem",
+                        "--client-key=privY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem"
+                    ]
+                )
+            else:
+                self.browser = await p.chromium.launch_persistent_context(
+                    headless=False,
+                    args=[
+                        "--ignore-certificate-errors",
+                        "--allow-insecure-localhost",
+                        "--client-certificate=certY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem",
+                        "--client-key=privY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem"
+                    ]
+                )
+            self.page = await self.browser.new_page()
 
     async def finish(self):
         '''
-        После написания всей программы запускаем этот метод, для закрытия эмулятора веб версии
+        После написания всей программы запускаем этот метод, для закрытия эмулятора веб версии / Вызывается в случае ошибки
         '''
         await self.browser.close()
+
+    async def handle_error(self, msg):
+        '''Метод для вызова ошибки и окончания работы парсера'''
+        print(msg)
+        await self.finish()
