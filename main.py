@@ -6,23 +6,25 @@ import keyboard
 from playwright.async_api import async_playwright
 
 
-# host = "50.114.181.135"
-# port = 63120
-# login = "ZcTq1NqyS"
-# password = "aaczYwsJU"
+host = "50.114.181.135"
+port = 63120
+login = "ZcTq1NqyS"
+password = "aaczYwsJU"
 
-host = "p1.mangoproxy.com"
-port = 2334
-login = "n66063054a6f17c192a006d-zone-custom-region-es"
-password = "b151e67bc2b9462683bdab5eb1ff4acc"
+# host = "p1.mangoproxy.com"
+# port = 2334
+# login = "n66063054a6f17c192a006d-zone-custom-region-es"
+# password = "b151e67bc2b9462683bdab5eb1ff4acc"
 
 async def first_page(page):
     url = "https://sede.administracionespublicas.gob.es/pagina/index/directorio/icpplus"
     await page.goto(url)
     await page.wait_for_selector("#formulario")
-    form = await page.query_selector("#formulario")
-    action = await form.get_attribute("action")
-    await page.goto(action)
+    # form = await page.query_selector("#formulario")
+    # action = await form.get_attribute("action")
+    # await asyncio.sleep(50000)
+    # await page.goto(action)
+    await (await page.query_selector(".uppercase.button_next")).click()
 
 async def second_page(page, city):
     await page.wait_for_selector(".sede")
@@ -33,7 +35,7 @@ async def second_page(page, city):
         if await option.inner_text() == city:
             await form.select_option(await option.get_attribute("value"))
             break
-    await page.evaluate("envia()")
+    await (await page.query_selector("#btnAceptar")).click() #ДЕЛАТЬ ВЕЗДЕ ТАК!!!!!!
 
 async def third_page(page, option1, option2):
         await page.wait_for_selector("select")
@@ -140,19 +142,13 @@ async def twelveth_page(page):
 
 async def main():
     async with async_playwright() as p:
-        browser = await p.chromium.launch_persistent_context(
-            user_data_dir=r"D:/_.programming/SPAIN_PARSER/data",
+        browser = await p.chromium.launch(
             headless=False, 
             proxy={
                 "server": f"{host}:{port}",
                 "username": login,
                 "password": password,
             },
-            # args=[
-            #     "--ignore-certificate-errors",
-            #     "--client-certificate=D:/_.programming/SPAIN_PARSER/combined.pem",
-            #     "--allow-insecure-localhost",
-            # ]
             args=[
                 "--ignore-certificate-errors",
                 "--allow-insecure-localhost",
@@ -161,13 +157,13 @@ async def main():
             ]
         )
         page = await browser.new_page()
-        await page.context.add_cookies([
-            {
-                'name': 'client-cert',
-                'value': 'D:/_.programming/SPAIN_PARSER/combined.pem',
-                'url': 'https://sede.administracionespublicas.gob.es'
-            }
-        ])
+        # await page.context.add_cookies([
+        #     {
+        #         'name': 'client-cert',
+        #         'value': 'D:/_.programming/SPAIN_PARSER/combined.pem',
+        #         'url': 'https://sede.administracionespublicas.gob.es'
+        #     }
+        # ])
         await first_page(page)
         await second_page(page, "Valencia")
         await third_page(page, "CNP COMISARIA PATRAIX EXTRANJERIA, GREMIS, 6, VALENCIA", "POLICIA-TOMA DE HUELLA (EXPEDICIÓN DE TARJETA), RENOVACIÓN DE TARJETA DE LARGA DURACIÓN Y DUPLICADO")
