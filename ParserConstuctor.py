@@ -242,15 +242,15 @@ def read_json(filepath):
         return json.load(file)
 
 if __name__ == "__main__":
-    # host = "50.114.181.135"
-    # port = 63120
-    # login = "ZcTq1NqyS"
-    # password = "aaczYwsJU"
+    host = "50.114.181.135"
+    port = 63120
+    login = "ZcTq1NqyS"
+    password = "aaczYwsJU"
 
-    host = "p1.mangoproxy.com"
-    port = 2334
-    login = "n66063054a6f17c192a006d-zone-custom-region-es"
-    password = "b151e67bc2b9462683bdab5eb1ff4acc"
+    # host = "p1.mangoproxy.com"
+    # port = 2334
+    # login = "n66063054a6f17c192a006d-zone-custom-region-es"
+    # password = "b151e67bc2b9462683bdab5eb1ff4acc"
 
     worker_data = read_json("test.json")
     
