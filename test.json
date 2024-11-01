@@ -19,10 +19,5 @@
         "15": ["Заполнить поле", "t2est@gmail.com", "emailUNO"],
         "16": ["Заполнить поле", "t2est@gmail.com", "emailDOS"],
         "17": ["Прислать уведомление"]
-    },
-    "1": 
-    {
-        "0": ["Запустить парсер", "https://sede.administracionespublicas.gob.es/pagina/index/directorio/icpplus"],
-        "1": ["Прислать уведомление"]
     }
 }
