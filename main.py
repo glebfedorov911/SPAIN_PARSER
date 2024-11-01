@@ -117,7 +117,7 @@ async def nineth_page(page, phone, email1, email2):
 
     await page.evaluate("enviar()")
 
-async def tenth_page(page, num):
+async def tenth_page(page, num): #ВЫБОР ЗАПИСИ!!!!!!!!!
     await page.wait_for_selector("#cita1")
     await asyncio.sleep(random.uniform(5, 8))
     await page.click(f"#cita{num}")

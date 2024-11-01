@@ -17,6 +17,9 @@ from playsound import playsound
     Если нужно нажать enter на клавиатуре (при работе с ЭПЦ), то первое поле заполнить - "Нажать enter"
     Если нужно заполнить поле каким-то значением, то первое поле заполнить - "Заполнить поле"
     Если нужно издать звук уведомления - "Прислать уведомление" (вызывать после последней страницы перед бронью) в противном случае прописываем дальнейший функционал
+
+Для автоматического выбора номера записи используется id #cita(число) вместо (число) нужно указать время, которое нас устраивает, то есть если там
+3 предложенных времени, то нужно указать 1 или 2, или 3.
 '''
 
 class ParserConstructor:
@@ -37,7 +40,7 @@ class ParserConstructor:
         '''
         try:
             await self.page.wait_for_selector(selector)
-            await asyncio.sleep(random.uniform(1, 5))
+            await asyncio.sleep(random.uniform(2, 5))
             buttons = await self.page.query_selector_all(selector)
             button = buttons[-1] if not _id else buttons[_id-1]
             await button.click()
@@ -57,7 +60,7 @@ class ParserConstructor:
         '''
         try:
             await self.page.wait_for_selector(form_selector)
-            await asyncio.sleep(random.uniform(1, 5))
+            await asyncio.sleep(random.uniform(2, 5))
             
             form = await self.page.query_selector(form_selector)
             if option_selector:
@@ -114,7 +117,7 @@ class ParserConstructor:
         '''
         try:
             await self.page.wait_for_selector(selector)
-            await asyncio.sleep(random.uniform(3, 5))
+            await asyncio.sleep(random.uniform(2, 5))
             field = await self.page.query_selector(selector)
             await field.fill(value_for_fill)
             print("Поле успешно заполенено")
@@ -173,14 +176,15 @@ class ParserConstructor:
         sound_file = "sound/sound.mp3"
         playsound(sound_file)
 
-async def main(host, port, login, password, worker_data):
-    pc = ParserConstructor(host=host, port=port, login=login, password=password)
-    time_to_finish = 7200 #секунды
+async def parser_worker(queue: asyncio.Queue):
+    while True:
+        host, port, login, password, worker_data = await queue.get()
+        pc = ParserConstructor(host=host, port=port, login=login, password=password)
+        time_to_finish = 7200 #секунды
 
-    try:
-        for index_parser_data in worker_data:
-            for index_page_data in worker_data[index_parser_data]:
-                data = worker_data[index_parser_data][index_page_data]
+        try:
+            for index_page_data in worker_data:
+                data = worker_data[index_page_data]
                 args = data[1:]
                 match data[0]:
                     case "Запустить парсер":
@@ -211,8 +215,20 @@ async def main(host, port, login, password, worker_data):
                         print("Неизвестная команда")
                         break
             await pc.finish()
-    except Exception as e:
-        await pc.handle_error("Ошибка в основном цикле", e)
+        except Exception as e:
+            await pc.handle_error("Ошибка в основном цикле", e)
+
+async def main(host, port, login, password, worker_data):
+    queue = asyncio.Queue()
+    for index_block_parser in worker_data:
+        await queue.put((host, port, login, password, worker_data[index_block_parser]))
+
+    workers = [asyncio.create_task(parser_worker(queue=queue)) for _ in range(3)]
+
+    await queue.join()
+
+    for worker in workers:
+        worker.cancel()
 
 def read_json(filepath):
     with open(filepath, encoding="utf-8") as file:
@@ -230,4 +246,5 @@ if __name__ == "__main__":
     password = "b151e67bc2b9462683bdab5eb1ff4acc"
 
     worker_data = read_json("test.json")
+    
     asyncio.run(main(host=host, port=port, login=login, password=password, worker_data=worker_data))
