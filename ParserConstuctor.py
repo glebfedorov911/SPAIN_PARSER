@@ -175,7 +175,8 @@ class ParserConstructor:
 
 async def main(host, port, login, password, worker_data):
     pc = ParserConstructor(host=host, port=port, login=login, password=password)
-    
+    time_to_finish = 7200 #секунды
+
     try:
         for index_parser_data in worker_data:
             for index_page_data in worker_data[index_parser_data]:
@@ -202,8 +203,8 @@ async def main(host, port, login, password, worker_data):
                         continue
                     case "Прислать уведомление":
                         pc.notification()
-                        print(f"До закрытия браузера есть: {7200//3600} часа/ов")
-                        await asyncio.sleep(7200)
+                        print(f"До закрытия браузера есть: {time_to_finish//3600} часа/ов")
+                        await asyncio.sleep(time_to_finish)
                         print(f"Время вышло")
                         continue
                     case _:
