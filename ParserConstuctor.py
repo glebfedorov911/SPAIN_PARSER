@@ -138,8 +138,8 @@ class ParserConstructor:
                 args=[
                     "--ignore-certificate-errors",
                     "--allow-insecure-localhost",
-                    "--client-certificate=certY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem",
-                    "--client-key=privY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem"
+                    "--client-certificate=cert/certY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem",
+                    "--client-key=cert/privY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem"
                 ]
             )
         else:
@@ -148,8 +148,8 @@ class ParserConstructor:
                 args=[
                     "--ignore-certificate-errors",
                     "--allow-insecure-localhost",
-                    "--client-certificate=certY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem",
-                    "--client-key=privY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem"
+                    "--client-certificate=cert/certY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem",
+                    "--client-key=cert/privY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem"
                 ]
             )
         self.page = await self.browser.new_page()
