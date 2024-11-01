@@ -5,8 +5,8 @@ import json
 
 from playwright.async_api import async_playwright, TimeoutError
 
+from playsound import playsound
 
-# моментальная бронь, звуковое оповещение (если дошло до брони)
 
 '''
 Инструкция по заполнению JSON:
@@ -16,6 +16,7 @@ from playwright.async_api import async_playwright, TimeoutError
     Если нужно воспользоваться альтернативным нажатием на кнопку, то первое поле заполнить - "Альтернативное нажатие"
     Если нужно нажать enter на клавиатуре (при работе с ЭПЦ), то первое поле заполнить - "Нажать enter"
     Если нужно заполнить поле каким-то значением, то первое поле заполнить - "Заполнить поле"
+    Если нужно издать звук уведомления - "Прислать уведомление" (вызывать после последней страницы перед бронью) в противном случае прописываем дальнейший функционал
 '''
 
 class ParserConstructor:
@@ -126,34 +127,31 @@ class ParserConstructor:
         '''
         Перед написанием всей программы запускаем этот метод, для открытия эмулятора веб версии
         '''
-        self.playwright = await async_playwright().start()
-        if self.host:
-            self.browser = await self.playwright.chromium.launch(
-                headless=False,
-                proxy={
+        try:
+            self.playwright = await async_playwright().start()
+            browser_options = {
+                "headless": False,
+                "args": [
+                    "--ignore-certificate-errors",
+                    "--allow-insecure-localhost",
+                    "--client-certificate=cert/certY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem",
+                    "--client-key=cert/privY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem"
+                ],
+            }
+
+
+            if self.host:
+                browser_options["proxy"] = {
                     "server": f"{self.host}:{self.port}",
                     "username": self.login,
                     "password": self.password,
-                },
-                args=[
-                    "--ignore-certificate-errors",
-                    "--allow-insecure-localhost",
-                    "--client-certificate=cert/certY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem",
-                    "--client-key=cert/privY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem"
-                ]
-            )
-        else:
-            self.browser = await self.playwright.chromium.launch(
-                headless=False,
-                args=[
-                    "--ignore-certificate-errors",
-                    "--allow-insecure-localhost",
-                    "--client-certificate=cert/certY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem",
-                    "--client-key=cert/privY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem"
-                ]
-            )
-        self.page = await self.browser.new_page()
-        await self.page.goto(url)
+                }
+
+            self.browser = await self.playwright.chromium.launch(**browser_options)
+            self.page = await self.browser.new_page()
+            await self.page.goto(url)
+        except Exception as e:
+            await self.handle_error("Ошибка при запуске браузера или переходе на страницу", e)
 
     async def finish(self):
         '''
@@ -170,36 +168,50 @@ class ParserConstructor:
         print(f"{msg} | {str(e) if e else ''}")
         await self.finish()
 
+    @staticmethod
+    def notification():
+        sound_file = "sound/sound.mp3"
+        playsound(sound_file)
+
 async def main(host, port, login, password, worker_data):
     pc = ParserConstructor(host=host, port=port, login=login, password=password)
-
-    for index_parser_data in worker_data:
-        for index_page_data in worker_data[index_parser_data]:
-            data = worker_data[index_parser_data][index_page_data]
-            args = data[1:]
-            match data[0]:
-                case "Запустить парсер":
-                    await pc.start(*args)
-                    continue
-                case "Нажать кнопку":
-                    await pc.button_click(*args)
-                    continue
-                case "Выбрать значение":
-                    await pc.select_option(*args)
-                    continue
-                case "Альтернативное нажатие":
-                    await pc.alternative_for_next_page(*args)
-                    continue
-                case "Нажать enter":
-                    await pc.click_enter_on_page()
-                    continue
-                case "Заполнить поле":
-                    await pc.fill_field(*args)
-                    continue
-                case _:
-                    print("Неизвестная команда")
-                    break
-        await pc.finish()
+    
+    try:
+        for index_parser_data in worker_data:
+            for index_page_data in worker_data[index_parser_data]:
+                data = worker_data[index_parser_data][index_page_data]
+                args = data[1:]
+                match data[0]:
+                    case "Запустить парсер":
+                        await pc.start(*args)
+                        continue
+                    case "Нажать кнопку":
+                        await pc.button_click(*args)
+                        continue
+                    case "Выбрать значение":
+                        await pc.select_option(*args)
+                        continue
+                    case "Альтернативное нажатие":
+                        await pc.alternative_for_next_page(*args)
+                        continue
+                    case "Нажать enter":
+                        await pc.click_enter_on_page()
+                        continue
+                    case "Заполнить поле":
+                        await pc.fill_field(*args)
+                        continue
+                    case "Прислать уведомление":
+                        pc.notification()
+                        print(f"До закрытия браузера есть: {7200//3600} часа/ов")
+                        await asyncio.sleep(7200)
+                        print(f"Время вышло")
+                        continue
+                    case _:
+                        print("Неизвестная команда")
+                        break
+            await pc.finish()
+    except Exception as e:
+        await pc.handle_error("Ошибка в основном цикле", e)
 
 def read_json(filepath):
     with open(filepath, encoding="utf-8") as file:
