@@ -11,8 +11,8 @@
         "7": ["Нажать кнопку", "#btnAccesoClave"],
         "8": ["Альтернативное нажатие", "JAVASCRIPT:selectedIdP('AFIRMA');idpRedirect.submit();"],
         "9": ["Нажать enter"],
-        "10": ["Заполнить поле", "Y5008755j", "#txtIdCitado"],
-        "11": ["Заполнить поле", "DANIL RUBIN", "#txtDesCitado"],
+        "10": ["Заполнить поле", "Y5008703F", "#txtIdCitado"],
+        "11": ["Заполнить поле", "VITALII PANFILOV", "#txtDesCitado"],
         "12": ["Выбрать значение", "ARGELIA", "#txtPaisNac", "#txtPaisNac"],
         "13": ["Нажать кнопку", "#btnEnviar"],
         "14": ["Прислать уведомление"]
