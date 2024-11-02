@@ -23,6 +23,8 @@ from playsound import playsound
 '''
 
 class ParserConstructor:
+    time_to_finish = 7200
+
     def __init__(self, host=None, port=None, login=None, password=None):
         '''Заполнить эти поля, если есть прокси'''
         self.host = host
@@ -172,10 +174,12 @@ class ParserConstructor:
         await self.finish()
         raise Exception #для перезапуска парсера
 
-    @staticmethod
-    def notification():
+    async def notification(self):
         sound_file = "sound/sound.mp3"
         playsound(sound_file)
+        print(f"До закрытия браузера есть: {self.time_to_finish//3600} часа/ов")
+        await asyncio.sleep(self.time_to_finish)
+        print(f"Время вышло")
 
 async def parser_worker(queue: asyncio.Queue):
     while True:
@@ -184,38 +188,25 @@ async def parser_worker(queue: asyncio.Queue):
         pc = ParserConstructor(host=host, port=port, login=login, password=password)
         time_to_finish = 7200 #секунды
 
+        commands = {
+            "Запустить парсер": pc.start,
+            "Нажать кнопку": pc.button_click,
+            "Выбрать значение": pc.select_option,
+            "Альтернативное нажатие": pc.alternative_for_next_page,
+            "Нажать enter": pc.start,
+            "Заполнить поле": pc.start,
+            "Прислать уведомление": pc.start,
+        }
+
         try:
             for index_page_data in worker_data:
                 data = worker_data[index_page_data]
                 args = data[1:]
-                match data[0]:
-                    case "Запустить парсер":
-                        await pc.start(*args)
-                        continue
-                    case "Нажать кнопку":
-                        await pc.button_click(*args)
-                        continue
-                    case "Выбрать значение":
-                        await pc.select_option(*args)
-                        continue
-                    case "Альтернативное нажатие":
-                        await pc.alternative_for_next_page(*args)
-                        continue
-                    case "Нажать enter":
-                        await pc.click_enter_on_page()
-                        continue
-                    case "Заполнить поле":
-                        await pc.fill_field(*args)
-                        continue
-                    case "Прислать уведомление":
-                        pc.notification()
-                        print(f"До закрытия браузера есть: {time_to_finish//3600} часа/ов")
-                        await asyncio.sleep(time_to_finish)
-                        print(f"Время вышло")
-                        continue
-                    case _:
-                        print("Неизвестная команда")
-                        break
+                if data[0] in commands:
+                    await commands[data[0]](*args)
+                else:
+                    print("Неизвестная команда")
+                    break
             await pc.finish()
         except Exception as e:
             print("Ошибка в основном цикле", e if e else '')
@@ -242,15 +233,15 @@ def read_json(filepath):
         return json.load(file)
 
 if __name__ == "__main__":
-    host = "50.114.181.135"
-    port = 63120
-    login = "ZcTq1NqyS"
-    password = "aaczYwsJU"
+    # host = "50.114.181.135"
+    # port = 63120
+    # login = "ZcTq1NqyS"
+    # password = "aaczYwsJU"
 
-    # host = "p1.mangoproxy.com"
-    # port = 2334
-    # login = "n66063054a6f17c192a006d-zone-custom-region-es"
-    # password = "b151e67bc2b9462683bdab5eb1ff4acc"
+    host = "p1.mangoproxy.com"
+    port = 2334
+    login = "n66063054a6f17c192a006d-zone-custom-region-es"
+    password = "b151e67bc2b9462683bdab5eb1ff4acc"
 
     worker_data = read_json("test.json")
     
