@@ -25,6 +25,7 @@ from playsound import playsound
 class ParserConstructor:
     time_to_finish = 7200
     sound_file = "sound/sound.mp3"
+    headless = False
 
     def __init__(self, host=None, port=None, login=None, password=None):
         '''Заполнить эти поля, если есть прокси'''
@@ -43,7 +44,7 @@ class ParserConstructor:
         '''
         try:
             await self.page.wait_for_selector(selector)
-            await asyncio.sleep(random.uniform(2, 5))
+            await asyncio.sleep(random.uniform(1, 3))
             buttons = await self.page.query_selector_all(selector)
             button = buttons[-1] if not _id else buttons[_id-1]
             await button.click()
@@ -63,7 +64,7 @@ class ParserConstructor:
         '''
         try:
             await self.page.wait_for_selector(form_selector)
-            await asyncio.sleep(random.uniform(2, 5))
+            await asyncio.sleep(random.uniform(1, 3))
             
             form = await self.page.query_selector(form_selector)
             if option_selector:
@@ -73,7 +74,7 @@ class ParserConstructor:
 
             for option in options:
                 if option_value in await option.get_attribute("value") or option_value in await option.inner_text():
-                    await asyncio.sleep(random.uniform(2, 3))
+                    await asyncio.sleep(random.uniform(1, 2))
                     await form.select_option(await option.get_attribute("value"))
                     print("Успешно выбрали поле в форме!!")
                     break
@@ -92,7 +93,7 @@ class ParserConstructor:
         '''
         try:
             await self.page.wait_for_selector("body")
-            await asyncio.sleep(random.uniform(2, 5))
+            await asyncio.sleep(random.uniform(1, 3))
             await self.page.evaluate(_eval)
             print("Успешно выполнен переход")
         except TimeoutError as te:
@@ -105,7 +106,7 @@ class ParserConstructor:
         При выборе ЭПЦ необходимо выбрать ее, нужно нажать enter, вызываем эту функцию
         '''
         try:
-            await asyncio.sleep(random.uniform(10, 15))
+            await asyncio.sleep(random.uniform(8, 10))
             keyboard.press_and_release('enter')
             print("Успешно выполнено нажатие!")
         except TimeoutError as te:
@@ -120,7 +121,7 @@ class ParserConstructor:
         '''
         try:
             await self.page.wait_for_selector(selector)
-            await asyncio.sleep(random.uniform(2, 5))
+            await asyncio.sleep(random.uniform(1, 3))
             field = await self.page.query_selector(selector)
             await field.fill(value_for_fill)
             print("Поле успешно заполенено")
@@ -142,7 +143,7 @@ class ParserConstructor:
         try:
             self.playwright = await async_playwright().start()
             browser_options = {
-                "headless": False,
+                "headless": self.headless,
                 "args": [
                     "--ignore-certificate-errors",
                     "--allow-insecure-localhost",
