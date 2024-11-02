@@ -128,6 +128,13 @@ class ParserConstructor:
         except Exception as e:
             await self.handle_error("Ошибка!", e)
 
+    async def notification(self):
+        sound_file = "sound/sound.mp3"
+        playsound(sound_file)
+        print(f"До закрытия браузера есть: {self.time_to_finish//3600} часа/ов")
+        await asyncio.sleep(self.time_to_finish)
+        print(f"Время вышло")
+
     async def start(self, url):
         '''
         Перед написанием всей программы запускаем этот метод, для открытия эмулятора веб версии
@@ -143,7 +150,6 @@ class ParserConstructor:
                     "--client-key=cert/privY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem"
                 ],
             }
-
 
             if self.host:
                 browser_options["proxy"] = {
@@ -174,13 +180,6 @@ class ParserConstructor:
         await self.finish()
         raise Exception #для перезапуска парсера
 
-    async def notification(self):
-        sound_file = "sound/sound.mp3"
-        playsound(sound_file)
-        print(f"До закрытия браузера есть: {self.time_to_finish//3600} часа/ов")
-        await asyncio.sleep(self.time_to_finish)
-        print(f"Время вышло")
-
 async def parser_worker(queue: asyncio.Queue):
     while True:
         print("Цикл запущен")
@@ -193,9 +192,9 @@ async def parser_worker(queue: asyncio.Queue):
             "Нажать кнопку": pc.button_click,
             "Выбрать значение": pc.select_option,
             "Альтернативное нажатие": pc.alternative_for_next_page,
-            "Нажать enter": pc.start,
-            "Заполнить поле": pc.start,
-            "Прислать уведомление": pc.start,
+            "Нажать enter": pc.click_enter_on_page,
+            "Заполнить поле": pc.fill_field,
+            "Прислать уведомление": pc.notification,
         }
 
         try:
@@ -203,6 +202,7 @@ async def parser_worker(queue: asyncio.Queue):
                 data = worker_data[index_page_data]
                 args = data[1:]
                 if data[0] in commands:
+                    print(data[0], *args)
                     await commands[data[0]](*args)
                 else:
                     print("Неизвестная команда")
