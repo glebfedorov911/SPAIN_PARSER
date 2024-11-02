@@ -202,7 +202,6 @@ async def parser_worker(queue: asyncio.Queue):
                 data = worker_data[index_page_data]
                 args = data[1:]
                 if data[0] in commands:
-                    print(data[0], *args)
                     await commands[data[0]](*args)
                 else:
                     print("Неизвестная команда")
