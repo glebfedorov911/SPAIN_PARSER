@@ -24,6 +24,7 @@ from playsound import playsound
 
 class ParserConstructor:
     time_to_finish = 7200
+    sound_file = "sound/sound.mp3"
 
     def __init__(self, host=None, port=None, login=None, password=None):
         '''Заполнить эти поля, если есть прокси'''
@@ -129,8 +130,7 @@ class ParserConstructor:
             await self.handle_error("Ошибка!", e)
 
     async def notification(self):
-        sound_file = "sound/sound.mp3"
-        playsound(sound_file)
+        await asyncio.to_thread(playsound, self.sound_file)
         print(f"До закрытия браузера есть: {self.time_to_finish//3600} часа/ов")
         await asyncio.sleep(self.time_to_finish)
         print(f"Время вышло")
@@ -153,7 +153,7 @@ class ParserConstructor:
 
             if self.host:
                 browser_options["proxy"] = {
-                    "server": f"{self.host}:{self.port}",
+                    "server": f"http://{self.host}:{self.port}",
                     "username": self.login,
                     "password": self.password,
                 }
