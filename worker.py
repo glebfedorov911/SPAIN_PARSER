@@ -4,6 +4,7 @@ from ParserConstuctor import ParserConstructor
 
 
 async def parser_worker(queue: asyncio.Queue):
+    atms = 0
     while True:
         print("Цикл запущен")
         host, port, login, password, worker_data = await queue.get()
@@ -33,9 +34,14 @@ async def parser_worker(queue: asyncio.Queue):
                     break
             await pc.finish()
         except Exception as e:
+            atms += 1
             print("Ошибка в основном цикле", e if e else '')
             print("Добавляем обратно в очередь")
-            await queue.put((host, port, login, password, worker_data))
+            if atms < 7:
+                print(atms)
+                await queue.put((host, port, login, password, worker_data))
+            else:
+                print("Попытки закончились, браузер закрывается навсегда и уже не откроется.")
             await pc.finish()
         finally:
             queue.task_done()
