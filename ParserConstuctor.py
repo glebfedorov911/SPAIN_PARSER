@@ -3,6 +3,8 @@ import random
 import keyboard
 import json
 
+from fake_useragent import UserAgent
+
 from playwright.async_api import async_playwright, TimeoutError
 
 from playsound import playsound
@@ -26,6 +28,7 @@ class ParserConstructor:
     time_to_finish = 7200
     sound_file = "sound/sound.mp3"
     headless = False
+    ua = UserAgent()
 
     def __init__(self, host=None, port=None, login=None, password=None):
         '''Заполнить эти поля, если есть прокси'''
@@ -33,6 +36,7 @@ class ParserConstructor:
         self.port = port
         self.login = login
         self.password = password
+        self.context = None
         self.browser = None
         self.page = None
         self.playwright = None
@@ -107,7 +111,7 @@ class ParserConstructor:
         '''
         try:
             await asyncio.sleep(random.uniform(8, 10))
-            keyboard.press_and_release('enter')
+            await asyncio.to_thread(keyboard.press_and_release, 'enter')
             print("Успешно выполнено нажатие!")
         except TimeoutError as te:
             await self.handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
@@ -160,7 +164,8 @@ class ParserConstructor:
                 }
 
             self.browser = await self.playwright.chromium.launch(**browser_options)
-            self.page = await self.browser.new_page()
+            self.context = await self.browser.new_context(user_agent=self.ua.random)
+            self.page = await self.context.new_page()
             await self.page.goto(url)
         except Exception as e:
             await self.handle_error("Ошибка при запуске браузера или переходе на страницу", e)
