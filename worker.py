@@ -9,7 +9,6 @@ async def parser_worker(queue: asyncio.Queue):
         print("Цикл запущен")
         host, port, login, password, worker_data = await queue.get()
         pc = ParserConstructor(host=host, port=port, login=login, password=password)
-        time_to_finish = 7200 #секунды
 
         commands = {
             "Запустить парсер": pc.start,

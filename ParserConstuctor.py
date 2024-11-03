@@ -33,7 +33,6 @@ from datetime import datetime
 '''
 
 class ParserConstructor:
-    time_to_finish = 7200
     headless = False
     ua = UserAgent()
     directory = "records"
@@ -156,9 +155,11 @@ class ParserConstructor:
         except Exception as e:
             await self.handle_error("Ошибка!", e)
 
-    async def notification(self):
+    async def notification(self, time_to_finish = 2):
         '''
         Уведомление
+        time_to_finish - Время, после которого парсер продолжит свою работу
+        Дефолтное значение = 2 секунда (после звука уведомления)
         '''
         def generate_audio(frequency, duration):
             sample_rate = 44100 
@@ -170,8 +171,8 @@ class ParserConstructor:
         sd.play(sound_data, samplerate=44100)
         await asyncio.sleep(1.5) 
         sd.stop() 
-        print(f"До закрытия браузера есть: {self.time_to_finish // 3600} часа/ов")
-        await asyncio.sleep(self.time_to_finish)
+        print(f"До продолжения работы: {int(time_to_finish)} секунд/ы")
+        await asyncio.sleep(int(time_to_finish))
         print(f"Время вышло")
 
     async def save_time_record(self, selector, name):
