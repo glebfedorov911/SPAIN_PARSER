@@ -14,8 +14,6 @@ from playwright.async_api import async_playwright, TimeoutError
 from datetime import datetime
 
 
-#ДОБАВИТЬ ЭНДПОИНТПАУЗЫ!!!!!!!!
-#СОХРАНЯТЬ ДАТУ ЗАПИСИ
 '''
 Инструкция по заполнению JSON:
     Если нужно запустить парсер, то первое поле заполнить - "Запустить парсер"

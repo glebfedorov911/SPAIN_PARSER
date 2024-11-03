@@ -20,11 +20,6 @@ async def main(worker_data, host = None, port = None, login = None, password = N
         worker.cancel()
 
 if __name__ == "__main__":
-    # host = "50.114.181.135"
-    # port = 63120
-    # login = "ZcTq1NqyS"
-    # password = "aaczYwsJU"
-    
     load_dotenv()
 
     host = "p1.mangoproxy.com"
