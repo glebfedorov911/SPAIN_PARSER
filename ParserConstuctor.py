@@ -1,15 +1,21 @@
 import asyncio
 import random
 import keyboard
+import aiofiles
+import os
 import json
+import numpy as np
+import sounddevice as sd
 
 from fake_useragent import UserAgent
 
 from playwright.async_api import async_playwright, TimeoutError
 
-from playsound import playsound
+from datetime import datetime
 
 
+#ДОБАВИТЬ ЭНДПОИНТПАУЗЫ!!!!!!!!
+#СОХРАНЯТЬ ДАТУ ЗАПИСИ
 '''
 Инструкция по заполнению JSON:
     Если нужно запустить парсер, то первое поле заполнить - "Запустить парсер"
@@ -19,6 +25,8 @@ from playsound import playsound
     Если нужно нажать enter на клавиатуре (при работе с ЭПЦ), то первое поле заполнить - "Нажать enter"
     Если нужно заполнить поле каким-то значением, то первое поле заполнить - "Заполнить поле"
     Если нужно издать звук уведомления - "Прислать уведомление" (вызывать после последней страницы перед бронью) в противном случае прописываем дальнейший функционал
+    Если хотите записать дату записи - "Записать дату"
+    Если хотите поставить паузу и выполнить действия в ручную - "Поставить задержку"
 
 Для автоматического выбора номера записи используется id #cita(число) вместо (число) нужно указать время, которое нас устраивает, то есть если там
 3 предложенных времени, то нужно указать 1 или 2, или 3.
@@ -26,20 +34,34 @@ from playsound import playsound
 
 class ParserConstructor:
     time_to_finish = 7200
-    sound_file = "sound/sound.mp3"
     headless = False
     ua = UserAgent()
+    directory = "records"
+    filename = f"record.txt"
+    path = f"{directory}/{filename}"
 
-    def __init__(self, host=None, port=None, login=None, password=None):
+    def __init__(self, host=None, port=None, login=None, password=None, client_cerf=None, client_key=None):
         '''Заполнить эти поля, если есть прокси'''
         self.host = host
         self.port = port
         self.login = login
         self.password = password
+        self.client_cerf = client_cerf
+        self.client_key = client_key
         self.context = None
         self.browser = None
         self.page = None
         self.playwright = None
+
+        self.create_directory()
+        self.create_file()
+
+    def create_directory(self):
+        os.makedirs(self.directory, exist_ok=True)
+
+    def create_file(self):
+        if not os.path.exists(self.path):
+            open(self.path, 'w')
 
     async def button_click(self, selector: str, _id: int = None):
         '''
@@ -52,7 +74,7 @@ class ParserConstructor:
             buttons = await self.page.query_selector_all(selector)
             button = buttons[-1] if not _id else buttons[_id-1]
             await button.click()
-            print("Все прошло успешно! Переходим на следующую страницу")
+            print("Все прошло успешно! Нажатие выполнено")
         except TimeoutError as te:
             await self.handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
         except Exception as e:
@@ -135,10 +157,40 @@ class ParserConstructor:
             await self.handle_error("Ошибка!", e)
 
     async def notification(self):
-        await asyncio.to_thread(playsound, self.sound_file)
-        print(f"До закрытия браузера есть: {self.time_to_finish//3600} часа/ов")
+        '''
+        Уведомление
+        '''
+        def generate_audio(frequency, duration):
+            sample_rate = 44100 
+            t = np.linspace(0, duration, int(sample_rate * duration), endpoint=False)
+            audio_data = 0.5 * np.sin(2 * np.pi * frequency * t) 
+            return audio_data
+
+        sound_data = generate_audio(frequency=440, duration=1.5)  
+        sd.play(sound_data, samplerate=44100)
+        await asyncio.sleep(1.5) 
+        sd.stop() 
+        print(f"До закрытия браузера есть: {self.time_to_finish // 3600} часа/ов")
         await asyncio.sleep(self.time_to_finish)
         print(f"Время вышло")
+
+    async def save_time_record(self, selector, name):
+        '''
+        Указать селектор (тот же что в кнопке), чтобы записать дату записи в файл (НО БЕЗ # . ИЛИ ПРОЧЕГО, ПРОСТО ИМЯ)
+        name - указать любое значение, которое вам удобно, чтобы ориентироваться в файле
+        '''
+        await asyncio.sleep(random.uniform(1, 3))
+        record_time = await (await self.page.query_selector(f"[for='{selector}']")).inner_text()
+        data = {name: record_time.replace("\n", ' ')}
+        await self.save_to_file(data)
+        print("Данные успешно сохранены в файл")
+
+    async def waiting(self, time):
+        '''
+        time - время остановки в секундах (ПЕРЕДАВАТЬ В КАВЫЧКАХ!!!)
+        '''
+        await asyncio.sleep(int(time))
+        print("Ожидание кончилось! Продолжаю выполнять действия...")
 
     async def start(self, url):
         '''
@@ -148,13 +200,15 @@ class ParserConstructor:
             self.playwright = await async_playwright().start()
             browser_options = {
                 "headless": self.headless,
-                "args": [
-                    "--ignore-certificate-errors",
-                    "--allow-insecure-localhost",
-                    "--client-certificate=cert/certY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem",
-                    "--client-key=cert/privY5008755J_DANIL_RUBIN_ciudadano_1647888216976.pem"
-                ],
             }
+
+            if self.client_cerf and self.client_key:
+                browser_options["args"] = [
+                    "--ignore-certificate-errors",
+                    "--allow-insecure-localhost", 
+                    f"--client-certificate=cert/{self.client_cerf}", 
+                    f"--client-key=cert/{self.client_key}"
+                ],
 
             if self.host:
                 browser_options["proxy"] = {
@@ -185,69 +239,7 @@ class ParserConstructor:
         print(f"{msg} | {str(e) if e else ''}")
         await self.finish()
         raise Exception #для перезапуска парсера
-
-async def parser_worker(queue: asyncio.Queue):
-    while True:
-        print("Цикл запущен")
-        host, port, login, password, worker_data = await queue.get()
-        pc = ParserConstructor(host=host, port=port, login=login, password=password)
-        time_to_finish = 7200 #секунды
-
-        commands = {
-            "Запустить парсер": pc.start,
-            "Нажать кнопку": pc.button_click,
-            "Выбрать значение": pc.select_option,
-            "Альтернативное нажатие": pc.alternative_for_next_page,
-            "Нажать enter": pc.click_enter_on_page,
-            "Заполнить поле": pc.fill_field,
-            "Прислать уведомление": pc.notification,
-        }
-
-        try:
-            for index_page_data in worker_data:
-                data = worker_data[index_page_data]
-                args = data[1:]
-                if data[0] in commands:
-                    await commands[data[0]](*args)
-                else:
-                    print("Неизвестная команда")
-                    break
-            await pc.finish()
-        except Exception as e:
-            print("Ошибка в основном цикле", e if e else '')
-            print("Добавляем обратно в очередь")
-            await queue.put((host, port, login, password, worker_data))
-            await pc.finish()
-        finally:
-            queue.task_done()
-
-async def main(host, port, login, password, worker_data):
-    queue = asyncio.Queue()
-    for index_block_parser in worker_data:
-        await queue.put((host, port, login, password, worker_data[index_block_parser]))
-
-    workers = [asyncio.create_task(parser_worker(queue=queue)) for _ in range(3)]
-
-    await queue.join()
-
-    for worker in workers:
-        worker.cancel()
-
-def read_json(filepath):
-    with open(filepath, encoding="utf-8") as file:
-        return json.load(file)
-
-if __name__ == "__main__":
-    # host = "50.114.181.135"
-    # port = 63120
-    # login = "ZcTq1NqyS"
-    # password = "aaczYwsJU"
-
-    host = "p1.mangoproxy.com"
-    port = 2334
-    login = "n66063054a6f17c192a006d-zone-custom-region-es"
-    password = "b151e67bc2b9462683bdab5eb1ff4acc"
-
-    worker_data = read_json("test.json")
     
-    asyncio.run(main(host=host, port=port, login=login, password=password, worker_data=worker_data))
+    async def save_to_file(self, data):
+        async with aiofiles.open(self.path, mode='a', encoding="UTF-8") as f:
+            await f.write(str(data) + "\n")
