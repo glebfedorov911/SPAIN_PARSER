@@ -37,14 +37,12 @@ class ParserConstructor:
     filename = f"record.txt"
     path = f"{directory}/{filename}"
 
-    def __init__(self, host=None, port=None, login=None, password=None, client_cerf=None, client_key=None):
+    def __init__(self, host=None, port=None, login=None, password=None):
         '''Заполнить эти поля, если есть прокси'''
         self.host = host
         self.port = port
         self.login = login
         self.password = password
-        self.client_cerf = client_cerf
-        self.client_key = client_key
         self.context = None
         self.browser = None
         self.page = None
@@ -115,8 +113,7 @@ class ParserConstructor:
         JAVASCRIPT:selectedIdP('AFIRMA');idpRedirect.submit(); | envia() - Функции onclick() onsubmit() указанные в html тегах
         '''
         try:
-            await self.page.wait_for_selector("body")
-            await asyncio.sleep(random.uniform(1, 3))
+            await asyncio.sleep(random.uniform(20, 25))
             await self.page.evaluate(_eval)
             print("Успешно выполнен переход")
         except TimeoutError as te:
@@ -201,20 +198,16 @@ class ParserConstructor:
             self.playwright = await async_playwright().start()
             browser_options = {
                 "headless": self.headless,
+                "args": [ 
+                    "--ignore-certificate-errors",
+                    "--allow-insecure-localhost", 
+                    ]
             }
             headers = {
                 "Accept-Language": "es-ES,es;q=0.9",
                 "Connection": "keep-alive",
                 "Accept-Encoding": "gzip, deflate"
             }
-
-            if self.client_cerf and self.client_key:
-                browser_options["args"] = [
-                    "--ignore-certificate-errors",
-                    "--allow-insecure-localhost", 
-                    f"--client-certificate=cert/{self.client_cerf}", 
-                    f"--client-key=cert/{self.client_key}"
-                ],
 
             if self.host:
                 browser_options["proxy"] = {
