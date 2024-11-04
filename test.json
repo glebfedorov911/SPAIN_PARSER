@@ -1,16 +1,19 @@
 {
     "0": 
     {
-        "0": ["Запустить парсер", "https://comforting-nougat-ce99c6.netlify.app/"],
-        "1": ["Нажать кнопку", "#cita1"],
-        "2": ["Прислать уведомление", "5"],
-        "3": ["Записать дату", "cita1", "Gleb Fedorov"]
-    },
-    "1": 
-    {
-        "0": ["Запустить парсер", "https://comforting-nougat-ce99c6.netlify.app/"],
-        "1": ["Нажать кнопку", "#cita1"],
-        "2": ["Прислать уведомление", "5"],
-        "3": ["Записать дату", "cita1", "Vyacheslav Zvart"]
+        "0": ["Запустить парсер", "https://sede.administracionespublicas.gob.es/pagina/index/directorio/icpplus"],
+        "1": ["Нажать кнопку", ".uppercase.button_next"],
+        "2": ["Выбрать значение", "Valencia", "#form"],
+        "3": ["Нажать кнопку", "#btnAceptar"],
+        "4": ["Выбрать значение", "CNP COMISARIA PATRAIX EXTRANJERIA, GREMIS, 6, VALENCIA", "#sede", "optgroup"],
+        "5": ["Выбрать значение", "POLICIA-TOMA DE HUELLA (EXPEDICIÓN DE TARJETA), RENOVACIÓN DE TARJETA DE LARGA DURACIÓN Y DUPLICADO", ".mf-input__l", ".mf-input__l"],
+        "6": ["Нажать кнопку", "#btnAceptar"],
+        "7": ["Нажать кнопку", "#btnEntrar"],
+        "8": ["Заполнить поле", "Y5008755J", "#txtIdCitado"],
+        "9": ["Заполнить поле", "DANIL RUBIN", "#txtDesCitado"],
+        "10": ["Выбрать значение", "ARGELIA", "#txtPaisNac"],
+        "11": ["Нажать кнопку", "#btnEnviar"],
+        "12": ["Нажать кнопку", "#btnEnviar"],
+        "13": ["Прислать уведомление", "10000"]
     }
 }

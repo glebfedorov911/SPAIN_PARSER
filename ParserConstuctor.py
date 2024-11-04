@@ -188,6 +188,8 @@ class ParserConstructor:
         '''
         time - время остановки в секундах (ПЕРЕДАВАТЬ В КАВЫЧКАХ!!!)
         '''
+        await self.page.wait_for_selector("body")
+        print("Ожидание началось", time, "секунд")
         await asyncio.sleep(int(time))
         print("Ожидание кончилось! Продолжаю выполнять действия...")
 
@@ -199,6 +201,11 @@ class ParserConstructor:
             self.playwright = await async_playwright().start()
             browser_options = {
                 "headless": self.headless,
+            }
+            headers = {
+                "Accept-Language": "es-ES,es;q=0.9",
+                "Connection": "keep-alive",
+                "Accept-Encoding": "gzip, deflate"
             }
 
             if self.client_cerf and self.client_key:
@@ -217,8 +224,9 @@ class ParserConstructor:
                 }
 
             self.browser = await self.playwright.chromium.launch(**browser_options)
-            self.context = await self.browser.new_context(user_agent=self.ua.random)
+            self.context = await self.browser.new_context(user_agent=self.ua.random, extra_http_headers=headers)
             self.page = await self.context.new_page()
+            self.page.set_default_timeout(30000)
             await self.page.goto(url)
         except Exception as e:
             await self.handle_error("Ошибка при запуске браузера или переходе на страницу", e)

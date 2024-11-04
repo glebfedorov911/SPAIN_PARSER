@@ -22,11 +22,18 @@ async def main(worker_data, host = None, port = None, login = None, password = N
 if __name__ == "__main__":
     load_dotenv()
 
-    host = "p1.mangoproxy.com"
-    port = 2334
-    login = "n66063054a6f17c192a006d-zone-custom-region-es"
-    password = "b151e67bc2b9462683bdab5eb1ff4acc"
+    # host = "50.114.181.135"
+    # port = 63120
+    # login = "ZcTq1NqyS"
+    # password = "aaczYwsJU"
+
+    # host = "p1.mangoproxy.com"
+    # port = 2334
+    # login = "n66063054a6f17c192a006d-zone-custom-region-es"
+    # password = "b151e67bc2b9462683bdab5eb1ff4acc"
+
+    # asyncio.run(main(host=host, port=port, login=login, password=password, worker_data=worker_data,
+    # client_cerf=os.getenv("CLIENT_CERF"), client_key=os.getenv("CLIENT_KEY")))
 
     worker_data = read_json("test.json")
-    asyncio.run(main(host=host, port=port, login=login, password=password, worker_data=worker_data, 
-    client_cerf=os.getenv("CLIENT_CERF"), client_key=os.getenv("CLIENT_KEY")))
+    asyncio.run(main(worker_data=worker_data))
