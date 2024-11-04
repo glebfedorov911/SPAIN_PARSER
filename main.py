@@ -25,7 +25,7 @@ if __name__ == "__main__":
     host = os.getenv("HOST")
     port = os.getenv("PORT")
     login = os.getenv("USER")
-    password = os.getenv("PASSWORD")
+    password = os.getenv("PASS")
 
     worker_data = read_json("test.json")
 
