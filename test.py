@@ -49,3 +49,25 @@
 #     if not os.path.exists(path):
 #         open(path, 'w')
 # create_file()
+
+
+# from twocaptcha import TwoCaptcha
+
+# solver = TwoCaptcha("1bcccbcfdbbabf371960eec04621f3d4")
+
+# result = solver.normal('image.png')
+
+# print('solved: ' + str(result))
+
+
+import pygetwindow as gw
+import time
+
+windows = gw.getAllWindows()
+windows_enterclick = []
+
+idx = 0
+for window in windows:
+    if "Загрузки" in window.title:
+        window.activate()
+        time.sleep(2)

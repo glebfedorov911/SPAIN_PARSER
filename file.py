@@ -1,6 +1,8 @@
 import json
+import aiofiles
 
 
-def read_json(filepath):
-    with open(filepath, encoding="utf-8") as file:
-        return json.load(file)
+async def read_json(filename: str = 'file_service.json'):
+    async with aiofiles.open(filename, mode='r', encoding='UTF-8') as f:
+        file_content = await f.read()
+        return json.loads(file_content)

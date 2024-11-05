@@ -7,6 +7,8 @@ import json
 import numpy as np
 import sounddevice as sd
 
+from pywinauto import Application
+
 from fake_useragent import UserAgent
 
 from playwright.async_api import async_playwright, TimeoutError
@@ -127,7 +129,12 @@ class ParserConstructor:
         '''
         try:
             await asyncio.sleep(random.uniform(8, 10))
+
+            self.set_front_window()
+            await asyncio.sleep(0.5)
             await asyncio.to_thread(keyboard.press_and_release, 'enter')
+            await asyncio.sleep(0.5)
+
             print("Успешно выполнено нажатие!")
         except TimeoutError as te:
             await self.handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
@@ -243,3 +250,10 @@ class ParserConstructor:
     async def save_to_file(self, data):
         async with aiofiles.open(self.path, mode='a', encoding="UTF-8") as f:
             await f.write(str(data) + "\n")
+
+    @staticmethod
+    def set_front_window():
+        window_title = 'Cl@ve – Chromium'
+        app = Application().connect(title_re=window_title)
+        windows = app.windows(title_re=window_title)
+        windows[0].set_focus()
