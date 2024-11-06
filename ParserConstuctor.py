@@ -219,6 +219,7 @@ class ParserConstructor:
         image_path = self.save_bytes_to_image(captcha_photo_url)
         captcha_text = self.captcha_text(image_path)
         await self.fill_field(captcha_text, "#captcha")
+        os.remove(image_path)
         print("Капча разгадана и записана")
 
     async def start(self, url):
@@ -293,7 +294,6 @@ class ParserConstructor:
         solver.set_key(API_KEY)
         solver.set_soft_id(0)
         solver.set_minLength(LENGTH)
-        solver.set_maxLength(LENGTH)
 
         captcha_text = solver.solve_and_return_solution(path)
         return captcha_text
