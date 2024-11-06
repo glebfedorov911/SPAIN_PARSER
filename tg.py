@@ -12,7 +12,7 @@ api_hash = "66272e8ade943a945315ec15220e572b"
 api_id = "23564252"
 phone_number = "+79869466585"
 
-client = TelegramClient('session_name', api_id, api_hash)
+client = TelegramClient('WorkWithTg', api_id, api_hash)
 start_parser = False
 
 @client.on(events.NewMessage(chats='check_cita_bot')) 
