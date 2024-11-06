@@ -21,6 +21,7 @@ async def parser_worker(delay: int, n: int, queue: asyncio.Queue):
             "Прислать уведомление": pc.notification,
             "Записать дату": pc.save_time_record,
             "Поставить задержку": pc.waiting,
+            "Решить капчу": pc.solve_captchas,
         }
 
         try:
