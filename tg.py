@@ -26,6 +26,8 @@ async def handler(event):
         await start(data[msg])
         start = False
         print("Парсер закончил работу")
+    else:
+        print("Парсер уже запущен/нет такого сообщения в конфигурационном файле")
         
 
 async def main():

@@ -31,4 +31,5 @@ async def start(filename):
 
     await parser(host=host, port=port, login=login, password=password, worker_data=worker_data)
 
-asyncio.run(start("test3.json"))
+if __name__ == "__main__":
+    asyncio.run(start("test.json"))

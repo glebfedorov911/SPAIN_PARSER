@@ -6,6 +6,7 @@ import os
 import json
 import numpy as np
 import sounddevice as sd
+import time
 
 from pywinauto import Application
 
@@ -14,6 +15,10 @@ from fake_useragent import UserAgent
 from playwright.async_api import async_playwright, TimeoutError
 
 from datetime import datetime
+
+from dotenv import load_dotenv
+
+from anticaptchaofficial.imagecaptcha import *
 
 
 '''
@@ -25,12 +30,14 @@ from datetime import datetime
     Если нужно нажать enter на клавиатуре (при работе с ЭПЦ), то первое поле заполнить - "Нажать enter"
     Если нужно заполнить поле каким-то значением, то первое поле заполнить - "Заполнить поле"
     Если нужно издать звук уведомления - "Прислать уведомление" (вызывать после последней страницы перед бронью) в противном случае прописываем дальнейший функционал
-    Если хотите записать дату записи - "Записать дату"
-    Если хотите поставить паузу и выполнить действия в ручную - "Поставить задержку"
+    Если нужно записать дату записи - "Записать дату"
+    Если нужно поставить паузу и выполнить действия в ручную - "Поставить задержку"
+    Если нужно решить капчу (то есть появится текстовая капча на странице) - "Решить капчу"
 
 Для автоматического выбора номера записи используется id #cita(число) вместо (число) нужно указать время, которое нас устраивает, то есть если там
 3 предложенных времени, то нужно указать 1 или 2, или 3.
 '''
+
 
 class ParserConstructor:
     headless = False
@@ -38,6 +45,7 @@ class ParserConstructor:
     directory = "records"
     filename = f"record.txt"
     path = f"{directory}/{filename}"
+    captcha_directory = "captcha"
 
     def __init__(self, host=None, port=None, login=None, password=None):
         '''Заполнить эти поля, если есть прокси'''
@@ -50,11 +58,12 @@ class ParserConstructor:
         self.page = None
         self.playwright = None
 
-        self.create_directory()
+        self.create_directories()
         self.create_file()
 
-    def create_directory(self):
+    def create_directories(self):
         os.makedirs(self.directory, exist_ok=True)
+        os.makedirs(self.captcha_directory, exist_ok=True)
 
     def create_file(self):
         if not os.path.exists(self.path):
@@ -197,6 +206,17 @@ class ParserConstructor:
         await asyncio.sleep(int(time))
         print("Ожидание кончилось! Продолжаю выполнять действия...")
 
+    async def solve_captchas(self):
+        '''
+        Указать метод, если на странице ожидается проверка
+        '''
+        await self.page.wait_for_selector(".img-thumbnail")
+        captcha_photo_url = convert_bytes_captcha(await (await self.page.query_selector(".img-thumbnail")).get_attribute("src"))
+        image_path = self.save_bytes_to_image(captcha_photo_url)
+        captcha_text = self.captcha_text(image_path)
+        await self.fill_field(captcha_text, "#captcha")
+        print("Капча разгадана и записана")
+
     async def start(self, url):
         '''
         Перед написанием всей программы запускаем этот метод, для открытия эмулятора веб версии
@@ -251,9 +271,37 @@ class ParserConstructor:
         async with aiofiles.open(self.path, mode='a', encoding="UTF-8") as f:
             await f.write(str(data) + "\n")
 
+    def save_bytes_to_image(self, url):
+        image_path = f"{self.captcha_directory}/captcha_{int(time.time())}.png"
+        captcha_image = base64.b64decode(url)
+        image = Image.open(BytesIO(captcha_image))
+        image.save(image_path, "PNG")
+        return image_path
+
+    @staticmethod
+    def captcha_text(path):
+        load_dotenv()
+        API_KEY = os.getenv("API")
+        LENGTH = 5
+
+        solver = imagecaptcha()
+        solver.set_verbose(1)
+        solver.set_key(API_KEY)
+        solver.set_soft_id(0)
+        solver.set_minLength(LENGTH)
+        solver.set_maxLength(LENGTH)
+
+        captcha_text = solver.solve_and_return_solution(path)
+        return captcha_text
+
     @staticmethod
     def set_front_window():
         window_title = 'Cl@ve – Chromium'
         app = Application().connect(title_re=window_title)
         windows = app.windows(title_re=window_title)
         windows[0].set_focus()
+
+    @staticmethod
+    def convert_bytes_captcha(url):
+        if url.startswith("data:image"):
+            return url.split(",")[1]

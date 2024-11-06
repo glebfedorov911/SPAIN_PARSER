@@ -21,6 +21,7 @@ async def parser_worker(delay: int, n: int, queue: asyncio.Queue):
             "Прислать уведомление": pc.notification,
             "Записать дату": pc.save_time_record,
             "Поставить задержку": pc.waiting,
+            "Решить капчу": solve_captchas,
         }
 
         try:
@@ -39,4 +40,5 @@ async def parser_worker(delay: int, n: int, queue: asyncio.Queue):
             await queue.put((host, port, login, password, worker_data))
             await pc.finish()
         finally:
+            print("Завершение работы")
             queue.task_done()
