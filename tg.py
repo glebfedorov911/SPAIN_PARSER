@@ -29,14 +29,15 @@ async def handler(event):
         
 
 async def main():
-    try:
-        await client.start(phone_number)
-        print("Клиент запущен. Ожидание сообщений от бота...")
-        await client.run_until_disconnected() 
-    except:
-        print("Переподключение через 5 секунд")
-        await asyncio.sleep(5)
-        print("Переподключаемся...")
+    while True:
+        try:
+            await client.start(phone_number)
+            print("Клиент запущен. Ожидание сообщений от бота...")
+            await client.run_until_disconnected() 
+        except:
+            print("Переподключение через 5 секунд")
+            await asyncio.sleep(5)
+            print("Переподключаемся...")
 
 with client:
     client.loop.run_until_complete(main())
