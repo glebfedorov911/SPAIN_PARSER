@@ -17,7 +17,7 @@ start_parser = False
 
 @client.on(events.NewMessage(chats='check_cita_bot')) 
 async def handler(event):
-    global start
+    global start_parser
     msg = event.message.text
     data = await read_json()
     if msg in data and not start:
