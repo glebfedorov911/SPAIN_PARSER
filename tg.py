@@ -13,7 +13,7 @@ api_id = "23564252"
 phone_number = "+79869466585"
 
 client = TelegramClient('session_name', api_id, api_hash)
-start = False
+start_parser = False
 
 @client.on(events.NewMessage(chats='check_cita_bot')) 
 async def handler(event):
@@ -21,10 +21,10 @@ async def handler(event):
     msg = event.message.text
     data = await read_json()
     if msg in data and not start:
-        start = True
+        start_parser = True
         print("Парсер успешно запущен")
         await start(data[msg])
-        start = False
+        start_parser = False
         print("Парсер закончил работу")
     else:
         print("Парсер уже запущен/нет такого сообщения в конфигурационном файле")
