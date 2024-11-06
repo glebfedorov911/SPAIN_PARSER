@@ -1,7 +1,8 @@
 {
     "0": 
     {
-        "0": ["Запустить парсер", "https://sede.administracionespublicas.gob.es/pagina/index/directorio/icpplus"],
-        "1": ["Прислать уведомление", "31110"]
+        "0": ["Запустить парсер", "https://comforting-nougat-ce99c6.netlify.app/"],
+        "1": ["Решить капчу"],
+        "2": ["Прислать уведомление", "31110"]
     }
 }
