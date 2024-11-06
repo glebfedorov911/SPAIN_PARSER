@@ -7,6 +7,10 @@ import json
 import numpy as np
 import sounddevice as sd
 import time
+import base64
+
+from PIL import Image
+from io import BytesIO
 
 from pywinauto import Application
 
@@ -211,7 +215,7 @@ class ParserConstructor:
         Указать метод, если на странице ожидается проверка
         '''
         await self.page.wait_for_selector(".img-thumbnail")
-        captcha_photo_url = convert_bytes_captcha(await (await self.page.query_selector(".img-thumbnail")).get_attribute("src"))
+        captcha_photo_url = self.convert_bytes_captcha(await (await self.page.query_selector(".img-thumbnail")).get_attribute("src"))
         image_path = self.save_bytes_to_image(captcha_photo_url)
         captcha_text = self.captcha_text(image_path)
         await self.fill_field(captcha_text, "#captcha")
@@ -281,7 +285,7 @@ class ParserConstructor:
     @staticmethod
     def captcha_text(path):
         load_dotenv()
-        API_KEY = os.getenv("API")
+        API_KEY = os.getenv("API_KEY")
         LENGTH = 5
 
         solver = imagecaptcha()
