@@ -20,7 +20,7 @@ async def handler(event):
     global start_parser
     msg = event.message.text
     data = await read_json()
-    if msg in data and not start:
+    if msg in data and not start_parser:
         start_parser = True
         print("Парсер успешно запущен")
         await start(data[msg])
