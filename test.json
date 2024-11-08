@@ -11,20 +11,21 @@
         "7": ["Нажать кнопку", "#btnAccesoClave"],
         "8": ["Альтернативное нажатие", "JAVASCRIPT:selectedIdP('AFIRMA');idpRedirect.submit();"],
         "9": ["Нажать enter"],
-        "10": ["Прислать уведомление", "31110"]
-    },
-    "1": 
-    {
-        "0": ["Запустить парсер", "https://sede.administracionespublicas.gob.es/pagina/index/directorio/icpplus"],
-        "1": ["Нажать кнопку", ".uppercase.button_next"],
-        "2": ["Выбрать значение", "Valencia", "#form"],
-        "3": ["Нажать кнопку", "#btnAceptar"],
-        "4": ["Выбрать значение", "CNP COMISARIA DE BURJASOT, C/  Doctor Joan Pesset , 2, Burjassot", "#sede", "optgroup"],
-        "5": ["Выбрать значение", "POLICIA-CARTA DE INVITACIÓN", ".mf-input__l", ".mf-input__l"],
-        "6": ["Нажать кнопку", "#btnAceptar"],
-        "7": ["Нажать кнопку", "#btnAccesoClave"],
-        "8": ["Альтернативное нажатие", "JAVASCRIPT:selectedIdP('AFIRMA');idpRedirect.submit();"],
-        "9": ["Нажать enter"],
-        "10": ["Прислать уведомление", "31110"]
+        "10": ["Нажать кнопку", "#rdbTipoDocNie"],
+        "11": ["Заполнить поле", "Y8800766S", "#txtIdCitado"],
+        "12": ["Заполнить поле", "DANIL RUBIN", "#txtDesCitado"],
+        "13": ["Выбрать значение", "ARGENTINA", "#txtPaisNac"],
+        "14": ["Нажать кнопку", "#btnEnviar"],
+        "15": ["Заполнить поле", "612345658", ".cajapeque"],
+        "16": ["Заполнить поле", "612345658a@gmail.com", "#emailUNO"],
+        "17": ["Заполнить поле", "612345658a@gmail.com", "#emailDOS"],
+        "18": ["Альтернативное нажатие", "enviar()"],
+        "19": ["Нажать кнопку", "#cita1"],
+        "20": ["Нажать кнопку", "#btnSiguiente"],
+        "21": ["Нажать кнопку", ".btn.btn-default"],
+        "22": ["Нажать кнопку", "#chkTotal"],
+        "23": ["Нажать кнопку", "#enviarCorreo"],
+        "24": ["Альтернативное нажатие", "envia()"],
+        "25": ["Альтернативное нажатие", "#btnSalir"]
     }
 }
