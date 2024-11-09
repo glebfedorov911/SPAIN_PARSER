@@ -80,7 +80,7 @@ class ParserConstructor:
         '''
         try:
             await self.page.wait_for_selector(selector)
-            await asyncio.sleep(random.uniform(1, 3))
+            # await asyncio.sleep(random.uniform(1, 3))
             buttons = await self.page.query_selector_all(selector)
             button = buttons[-1] if not _id else buttons[_id-1]
             await button.click()
@@ -100,7 +100,7 @@ class ParserConstructor:
         '''
         try:
             await self.page.wait_for_selector(form_selector)
-            await asyncio.sleep(random.uniform(1, 3))
+            # await asyncio.sleep(random.uniform(1, 3))
             
             form = await self.page.query_selector(form_selector)
             if option_selector:
@@ -110,7 +110,7 @@ class ParserConstructor:
 
             for option in options:
                 if option_value in await option.get_attribute("value") or option_value in await option.inner_text():
-                    await asyncio.sleep(random.uniform(1, 2))
+                    # await asyncio.sleep(random.uniform(1, 2))
                     await form.select_option(await option.get_attribute("value"))
                     print("Успешно выбрали поле в форме!!")
                     break
@@ -128,7 +128,7 @@ class ParserConstructor:
         JAVASCRIPT:selectedIdP('AFIRMA');idpRedirect.submit(); | envia() - Функции onclick() onsubmit() указанные в html тегах
         '''
         try:
-            await asyncio.sleep(random.uniform(20, 25))
+            await asyncio.sleep(random.uniform(10, 15))
             await self.page.evaluate(_eval)
             print("Успешно выполнен переход")
         except TimeoutError as te:
@@ -141,7 +141,7 @@ class ParserConstructor:
         При выборе ЭПЦ необходимо выбрать ее, нужно нажать enter, вызываем эту функцию
         '''
         try:
-            await asyncio.sleep(random.uniform(8, 10))
+            await asyncio.sleep(random.uniform(5, 8))
 
             self.set_front_window()
             await asyncio.sleep(0.5)
@@ -161,7 +161,7 @@ class ParserConstructor:
         '''
         try:
             await self.page.wait_for_selector(selector)
-            await asyncio.sleep(random.uniform(1, 3))
+            # await asyncio.sleep(random.uniform(1, 3))
             field = await self.page.query_selector(selector)
             await field.fill(value_for_fill)
             print("Поле успешно заполенено")
@@ -195,7 +195,7 @@ class ParserConstructor:
         Указать селектор (тот же что в кнопке), чтобы записать дату записи в файл (НО БЕЗ # . ИЛИ ПРОЧЕГО, ПРОСТО ИМЯ)
         name - указать любое значение, которое вам удобно, чтобы ориентироваться в файле
         '''
-        await asyncio.sleep(random.uniform(1, 3))
+        # await asyncio.sleep(random.uniform(1, 3))
         record_time = await (await self.page.query_selector(f"[for='{selector}']")).inner_text()
         data = {name: record_time.replace("\n", ' ')}
         await self.save_to_file(data)
