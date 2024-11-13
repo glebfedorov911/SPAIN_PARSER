@@ -90,7 +90,7 @@ class ParserConstructor:
         except Exception as e:
             await self.handle_error("Ошибка!", e)
 
-    async def select_option(self, option_value, form_selector, option_selector = None, idx = 0):
+    async def select_option(self, option_value, form_selector, option_selector = None, idx = 1):
         '''
         option_value - значение, которое хотите выбрать в option_selector
         form_selector - селектор html, который указан у тэга <form> или <select>
@@ -102,7 +102,7 @@ class ParserConstructor:
             await self.page.wait_for_selector(form_selector)
             await asyncio.sleep(random.uniform(1, 2))
             
-            form = (await self.page.query_selector_all(form_selector))[int(idx)]
+            form = (await self.page.query_selector_all(form_selector))[int(idx)-1]
             if option_selector:
                 options = await self.page.query_selector_all(f"{option_selector} option")
             else:
