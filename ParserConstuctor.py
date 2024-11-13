@@ -256,7 +256,7 @@ class ParserConstructor:
             self.browser = await self.playwright.chromium.launch(**browser_options)
             self.context = await self.browser.new_context(user_agent=self.ua.random, extra_http_headers=headers)
             self.page = await self.context.new_page()
-            self.page.set_default_timeout(10000)
+            self.page.set_default_timeout(20000)
             await self.page.goto(url)
         except Exception as e:
             await self.handle_error("Ошибка при запуске браузера или переходе на страницу", e)
