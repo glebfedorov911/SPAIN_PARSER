@@ -80,7 +80,7 @@ class ParserConstructor:
         '''
         try:
             await self.page.wait_for_selector(selector)
-            # await asyncio.sleep(random.uniform(1, 3))
+            await asyncio.sleep(random.uniform(1, 2))
             buttons = await self.page.query_selector_all(selector)
             button = buttons[-1] if not _id else buttons[_id-1]
             await button.click()
@@ -90,7 +90,7 @@ class ParserConstructor:
         except Exception as e:
             await self.handle_error("Ошибка!", e)
 
-    async def select_option(self, option_value, form_selector, option_selector = None):
+    async def select_option(self, option_value, form_selector, option_selector = None, idx = 0):
         '''
         option_value - значение, которое хотите выбрать в option_selector
         form_selector - селектор html, который указан у тэга <form> или <select>
@@ -100,9 +100,9 @@ class ParserConstructor:
         '''
         try:
             await self.page.wait_for_selector(form_selector)
-            # await asyncio.sleep(random.uniform(1, 3))
+            await asyncio.sleep(random.uniform(1, 2))
             
-            form = await self.page.query_selector(form_selector)
+            form = (await self.page.query_selector_all(form_selector))[int(idx)]
             if option_selector:
                 options = await self.page.query_selector_all(f"{option_selector} option")
             else:
@@ -110,7 +110,7 @@ class ParserConstructor:
 
             for option in options:
                 if option_value in await option.get_attribute("value") or option_value in await option.inner_text():
-                    # await asyncio.sleep(random.uniform(1, 2))
+                    await asyncio.sleep(random.uniform(.5, 1.5))
                     await form.select_option(await option.get_attribute("value"))
                     print("Успешно выбрали поле в форме!!")
                     break
@@ -136,7 +136,7 @@ class ParserConstructor:
         except Exception as e:
             await self.handle_error("Ошибка!", e)
 
-    async def click_enter_on_page(self):
+    async def click_enter_on_page(self, number):
         '''
         При выборе ЭПЦ необходимо выбрать ее, нужно нажать enter, вызываем эту функцию
         '''
@@ -145,6 +145,8 @@ class ParserConstructor:
 
             self.set_front_window()
             await asyncio.sleep(0.5)
+            for _ in range(1, int(number)):
+                await asyncio.to_thread(keyboard.press_and_release, 'down')
             await asyncio.to_thread(keyboard.press_and_release, 'enter')
             await asyncio.sleep(0.5)
 
@@ -154,16 +156,19 @@ class ParserConstructor:
         except Exception as e:
             await self.handle_error("Ошибка!", e)
 
-    async def fill_field(self, value_for_fill, selector):
+    async def fill_field(self, value_for_fill, selector, idx = None):
         '''
         selector - селектор html, пример (.uppercase.button_next - клаcc | #btnAceptar - id)
         value_for_fill - значение для заполнения поля
         '''
         try:
             await self.page.wait_for_selector(selector)
-            # await asyncio.sleep(random.uniform(1, 3))
+            await asyncio.sleep(random.uniform(1, 2))
             field = await self.page.query_selector(selector)
-            await field.fill(value_for_fill)
+            if isinstance(value_for_fill, list):
+                await field.fill(value_for_fill[idx])
+            else:
+                await field.fill(value_for_fill)
             print("Поле успешно заполенено")
         except TimeoutError as te:
             await self.handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
@@ -195,7 +200,7 @@ class ParserConstructor:
         Указать селектор (тот же что в кнопке), чтобы записать дату записи в файл (НО БЕЗ # . ИЛИ ПРОЧЕГО, ПРОСТО ИМЯ)
         name - указать любое значение, которое вам удобно, чтобы ориентироваться в файле
         '''
-        # await asyncio.sleep(random.uniform(1, 3))
+        await asyncio.sleep(random.uniform(1, 2))
         record_time = await (await self.page.query_selector(f"[for='{selector}']")).inner_text()
         data = {name: record_time.replace("\n", ' ')}
         await self.save_to_file(data)
@@ -251,7 +256,7 @@ class ParserConstructor:
             self.browser = await self.playwright.chromium.launch(**browser_options)
             self.context = await self.browser.new_context(user_agent=self.ua.random, extra_http_headers=headers)
             self.page = await self.context.new_page()
-            self.page.set_default_timeout(30000)
+            self.page.set_default_timeout(10000)
             await self.page.goto(url)
         except Exception as e:
             await self.handle_error("Ошибка при запуске браузера или переходе на страницу", e)

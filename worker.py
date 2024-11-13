@@ -6,6 +6,7 @@ from ParserConstuctor import ParserConstructor
 async def parser_worker(delay: int, n: int, queue: asyncio.Queue):
     print(f"до запуска {n} воркера осталось {delay} секунд")
     await asyncio.sleep(delay=delay)
+    number_of_validate_data = 0
     while True:
         print("Цикл запущен")
         host, port, login, password, worker_data = await queue.get()
@@ -29,7 +30,12 @@ async def parser_worker(delay: int, n: int, queue: asyncio.Queue):
                 data = worker_data[index_page_data]
                 args = data[1:]
                 if data[0] in commands:
-                    await commands[data[0]](*args)
+                    arguments = list(args)
+                    if data[0] == "Заполнить поле":
+                        if number_of_validate_data >= len(args[0]):
+                            number_of_validate_data = 0
+                        arguments.append(number_of_validate_data)
+                    await commands[data[0]](*arguments)
                 else:
                     print("Неизвестная команда")
                     break
@@ -40,4 +46,5 @@ async def parser_worker(delay: int, n: int, queue: asyncio.Queue):
             await queue.put((host, port, login, password, worker_data))
             await pc.finish()
         finally:
+            number_of_validate_data += 1
             queue.task_done()
