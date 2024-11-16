@@ -17,7 +17,6 @@ from pywinauto import Application
 from fake_useragent import UserAgent
 
 from playwright.async_api import async_playwright, TimeoutError
-from playwright_stealth import stealth_async
 
 from datetime import datetime
 
@@ -98,7 +97,6 @@ class ParserConstructor:
             button = buttons[-1] if not _id else buttons[int(_id)-1]
             await self.scroll_to_element(button)
             await button.click()
-            # await self.page.on('route', lambda route, request: route.continue_() if request.url == 'https://icp.administracionelectronica.gob.es/TSPD/083a28b6b8ab2000ab89b6d65f671ac0bf927d938d2f5b8dc25e4f0d87d19d6a9f3d35c16276d131?type=17' else route.abort())
             print("Все прошло успешно! Нажатие выполнено")
         except TimeoutError as te:
             await self.handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
@@ -263,13 +261,6 @@ class ParserConstructor:
                 ]
             }
 
-            # headers = {
-            #     "Accept-Language": "es-ES,es;q=0.9",
-            #     "Connection": "keep-alive",
-            #     "Accept-Encoding": "gzip, deflate, br",
-            #     "Connection": "keep-alive",
-            #     "Upgrade-Insecure-Requests": "1",
-            # }
             headers = {
                 "accept": "*/*",
                 "accept-encoding": "gzip, deflate, br, zstd",
@@ -297,7 +288,6 @@ class ParserConstructor:
                 viewport={'width': 1366, 'height': 768}
             )
             self.page = await self.context.new_page()
-            # await stealth_async(self.page)
             self.context.on('route', self.modify_headers)
             self.page.set_default_timeout(15000)
             await self.page.goto(url)

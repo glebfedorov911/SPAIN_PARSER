@@ -24,9 +24,9 @@
         "21": ["Прислать уведомление", "1"],
         "22": ["Нажать кнопку", "#btnSiguiente"],
         "23": ["Нажать кнопку", "body > div.jconfirm.jconfirm-light.jconfirm-open > div.jconfirm-scrollpane > div > div > div > div > div > div > div > div.jconfirm-buttons > button:nth-child(1)"],
-        "26": ["Нажать кнопку", "#chkTotal"],
-        "27": ["Нажать кнопку", "#enviarCorreo"],
-        "28": ["Нажать кнопку", "#btnConfirmar"],
-        "29": ["Нажать кнопку", "#btnSalir"]
+        "24": ["Нажать кнопку", "#chkTotal"],
+        "25": ["Нажать кнопку", "#enviarCorreo"],
+        "26": ["Нажать кнопку", "#btnConfirmar"],
+        "27": ["Нажать кнопку", "#btnSalir"]
     }
 }
