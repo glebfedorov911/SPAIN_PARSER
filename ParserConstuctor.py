@@ -78,18 +78,6 @@ class ParserConstructor:
         if not os.path.exists(self.path):
             open(self.path, 'w')
 
-    async def modify_headers(self, route, request):
-        headers = request.headers
-        headers['sec-fetch-mode'] = 'cors' 
-        await route.continue_(headers=headers)
-
-    async def scroll_to_element(self, element):
-        return await self.page.evaluate("""
-            (element) => {
-                element.scrollIntoView({ behavior: 'smooth', block: 'end' });
-            }
-        """, element)
-
     async def button_click(self, selector: str, _id: str = None):
         '''
         selector - селектор html, пример (.uppercase.button_next - клаcc | #btnAceptar - id)
@@ -315,6 +303,13 @@ class ParserConstructor:
         await self.finish()
         raise Exception #для перезапуска парсера
     
+    async def scroll_to_element(self, element):
+        return await self.page.evaluate("""
+            (element) => {
+                element.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+        """, element)
+
     async def save_to_file(self, data):
         async with aiofiles.open(self.path, mode='a', encoding="UTF-8") as f:
             await f.write(str(data) + "\n")
@@ -352,3 +347,9 @@ class ParserConstructor:
     def convert_bytes_captcha(url):
         if url.startswith("data:image"):
             return url.split(",")[1]
+
+    @staticmethod
+    async def modify_headers(route, request):
+        headers = request.headers
+        headers['sec-fetch-mode'] = 'cors' 
+        await route.continue_(headers=headers)
