@@ -73,7 +73,27 @@ class ParserConstructor:
         if not os.path.exists(self.path):
             open(self.path, 'w')
 
-    async def button_click(self, selector: str, _id: int = None):
+    async def scroll_to_element(self, element):
+        return await self.page.evaluate("""
+            (element) => {
+                element.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            }
+        """, element)
+
+    @staticmethod
+    async def coord_for_click(element):
+        coord = await element.bounding_box()
+        print(coord)
+        x, y = coord['x'] + coord['width'] / 2, coord['y'] + coord['height'] / 2
+        return x, y 
+
+    async def mouse_click(self, x, y):
+        await self.page.mouse.move(x, y)
+        await self.page.mouse.down()
+        await asyncio.sleep(0.1)
+        await self.page.mouse.up()
+
+    async def button_click(self, selector: str, _id: str = None):
         '''
         selector - селектор html, пример (.uppercase.button_next - клаcc | #btnAceptar - id)
         _id - если у кнопок одинаковые айди/классы, то нужно указать ее номер по счету (НАПРИМЕР КНОПКА ГДЕ ВЫБОР ЭЛЕКТРОННОЙ ПОДПИСИ - ОНА ВТОРАЯ, УКАЗЫВАЕМ 2)
@@ -82,8 +102,11 @@ class ParserConstructor:
             await self.page.wait_for_selector(selector)
             await asyncio.sleep(random.uniform(1, 2))
             buttons = await self.page.query_selector_all(selector)
-            button = buttons[-1] if not _id else buttons[_id-1]
-            await button.click()
+            button = buttons[-1] if not _id else buttons[int(_id)-1]
+            await self.scroll_to_element(button)
+            x, y = await self.coord_for_click(button)
+            await self.mouse_click(x, y)
+            # await button.click()
             print("Все прошло успешно! Нажатие выполнено")
         except TimeoutError as te:
             await self.handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
@@ -100,9 +123,10 @@ class ParserConstructor:
         '''
         try:
             await self.page.wait_for_selector(form_selector)
-            await asyncio.sleep(random.uniform(1, 2))
-            
+            await asyncio.sleep(random.uniform(1, 2))            
             form = (await self.page.query_selector_all(form_selector))[int(idx)-1]
+            await self.scroll_to_element(form)
+            await form.click()
             if option_selector:
                 options = await self.page.query_selector_all(f"{option_selector} option")
             else:
@@ -165,8 +189,9 @@ class ParserConstructor:
             await self.page.wait_for_selector(selector)
             await asyncio.sleep(random.uniform(1, 2))
             field = await self.page.query_selector(selector)
+            await self.scroll_to_element(field)
             if isinstance(value_for_fill, list):
-                await field.fill(value_for_fill[idx])
+                await field.fill(value_for_fill[int(idx)])
             else:
                 await field.fill(value_for_fill)
             print("Поле успешно заполенено")
@@ -257,7 +282,9 @@ class ParserConstructor:
                 }
 
             self.browser = await self.playwright.chromium.launch(**browser_options)
-            self.context = await self.browser.new_context(user_agent=self.ua.random, extra_http_headers=headers)
+            self.context = await self.browser.new_context(
+                user_agent=self.ua.random, 
+                extra_http_headers=headers)
             self.page = await self.context.new_page()
             self.page.set_default_timeout(15000)
             await self.page.goto(url)

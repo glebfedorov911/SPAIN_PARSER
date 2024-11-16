@@ -2,14 +2,14 @@
     "0": 
     {
         "0": ["Запустить парсер", "https://sede.administracionespublicas.gob.es/pagina/index/directorio/icpplus"],
-        "111": ["Поставить задержку", "3499234932493249"],
         "1": ["Нажать кнопку", ".uppercase.button_next"],
+        "111": ["Поставить задержку", "3499234932493249"],
         "2": ["Выбрать значение", "Valencia", "#form"],
         "3": ["Нажать кнопку", "#btnAceptar"],
         "5": ["Выбрать значение", "POLICIA-CARTA DE INVITACIÓN", ".mf-input__l", ".mf-input__l","1"],
         "6": ["Нажать кнопку", "#btnAceptar"],
         "7": ["Нажать кнопку", "#btnAccesoClave"],
-        "8": ["Альтернативное нажатие", "JAVASCRIPT:selectedIdP('AFIRMA');idpRedirect.submit();"],
+        "8": ["Нажать кнопку", ".idp-button", "2"],
         "9": ["Нажать enter", "3"],
         "10": ["Нажать кнопку", "#btnCopiar"],
         "11": ["Нажать кнопку", "#btnEnviar"],
