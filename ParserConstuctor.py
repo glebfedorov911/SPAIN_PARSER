@@ -14,8 +14,6 @@ from io import BytesIO
 
 from pywinauto import Application
 
-from fake_useragent import UserAgent
-
 from playwright.async_api import async_playwright, TimeoutError
 
 from datetime import datetime
@@ -45,7 +43,14 @@ from anticaptchaofficial.imagecaptcha import *
 
 class ParserConstructor:
     headless = False
-    ua = UserAgent()
+    user_agents = [
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 Edg/130.0.0.0",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:99.0) Gecko/20100101 Firefox/99.0",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:110.0) Gecko/20100101 Firefox/110.0",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:130.0) Gecko/20100101 Firefox/130.0",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:100.0) Gecko/20100101 Firefox/100.0",
+    ]
     directory = "records"
     filename = f"record.txt"
     path = f"{directory}/{filename}"
@@ -283,7 +288,7 @@ class ParserConstructor:
 
             self.browser = await self.playwright.chromium.launch(**browser_options)
             self.context = await self.browser.new_context(
-                user_agent=self.ua.random, 
+                user_agent=random.choice(self.user_agents), 
                 java_script_enabled=True,
                 viewport={'width': 1366, 'height': 768}
             )
