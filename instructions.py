@@ -23,7 +23,7 @@
         "19": ["Нажать кнопку", "#cita1"],
         "20": ["Записать дату", "cita1", "Record"],
         "21": ["Нажать кнопку", "#btnSiguiente"],
-        "22": ["Нажать кнопку", ".btn.btn-default"],
+        "22": ["Нажать кнопку", "body > div.jconfirm.jconfirm-light.jconfirm-open > div.jconfirm-scrollpane > div > div > div > div > div > div > div > div.jconfirm-buttons > button:nth-child(1)"],
         "23": ["Нажать кнопку", "#chkTotal"],
         "24": ["Нажать кнопку", "#enviarCorreo"],
         "25": ["Альтернативное нажатие", "envia()"],
