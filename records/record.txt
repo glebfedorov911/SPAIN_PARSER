@@ -1,1 +1,3 @@
-{'Number1': 'CITA 1 Día: 05/11/2024 Hora: 18:40 '}
+{'Vitalii': 'CITA 1 Día: 21/11/2024 Hora: 18:15 '}
+{'Vitalii': 'CITA 1 Día: 21/11/2024 Hora: 19:00 '}
+{'Vitalii': 'CITA 1 Día: 21/11/2024 Hora: 18:15 '}

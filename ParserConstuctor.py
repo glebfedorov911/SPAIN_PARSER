@@ -17,6 +17,7 @@ from pywinauto import Application
 from fake_useragent import UserAgent
 
 from playwright.async_api import async_playwright, TimeoutError
+from playwright_stealth import stealth_async
 
 from datetime import datetime
 
@@ -73,25 +74,17 @@ class ParserConstructor:
         if not os.path.exists(self.path):
             open(self.path, 'w')
 
+    async def modify_headers(self, route, request):
+        headers = request.headers
+        headers['sec-fetch-mode'] = 'cors' 
+        await route.continue_(headers=headers)
+
     async def scroll_to_element(self, element):
         return await self.page.evaluate("""
             (element) => {
                 element.scrollIntoView({ behavior: 'smooth', block: 'end' });
             }
         """, element)
-
-    @staticmethod
-    async def coord_for_click(element):
-        coord = await element.bounding_box()
-        print(coord)
-        x, y = coord['x'] + coord['width'] / 2, coord['y'] + coord['height'] / 2
-        return x, y 
-
-    async def mouse_click(self, x, y):
-        await self.page.mouse.move(x, y)
-        await self.page.mouse.down()
-        await asyncio.sleep(0.1)
-        await self.page.mouse.up()
 
     async def button_click(self, selector: str, _id: str = None):
         '''
@@ -100,13 +93,12 @@ class ParserConstructor:
         '''
         try:
             await self.page.wait_for_selector(selector)
-            await asyncio.sleep(random.uniform(1, 2))
+            await asyncio.sleep(random.uniform(2, 4))
             buttons = await self.page.query_selector_all(selector)
             button = buttons[-1] if not _id else buttons[int(_id)-1]
             await self.scroll_to_element(button)
-            x, y = await self.coord_for_click(button)
-            await self.mouse_click(x, y)
-            # await button.click()
+            await button.click()
+            # await self.page.on('route', lambda route, request: route.continue_() if request.url == 'https://icp.administracionelectronica.gob.es/TSPD/083a28b6b8ab2000ab89b6d65f671ac0bf927d938d2f5b8dc25e4f0d87d19d6a9f3d35c16276d131?type=17' else route.abort())
             print("Все прошло успешно! Нажатие выполнено")
         except TimeoutError as te:
             await self.handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
@@ -123,7 +115,7 @@ class ParserConstructor:
         '''
         try:
             await self.page.wait_for_selector(form_selector)
-            await asyncio.sleep(random.uniform(1, 2))            
+            await asyncio.sleep(random.uniform(2, 4))            
             form = (await self.page.query_selector_all(form_selector))[int(idx)-1]
             await self.scroll_to_element(form)
             await form.click()
@@ -134,7 +126,7 @@ class ParserConstructor:
 
             for option in options:
                 if option_value in await option.get_attribute("value") or option_value in await option.inner_text():
-                    await asyncio.sleep(random.uniform(.5, 1.5))
+                    await asyncio.sleep(random.uniform(1, 2))
                     await form.select_option(await option.get_attribute("value"))
                     print("Успешно выбрали поле в форме!!")
                     break
@@ -187,7 +179,7 @@ class ParserConstructor:
         '''
         try:
             await self.page.wait_for_selector(selector)
-            await asyncio.sleep(random.uniform(1, 2))
+            await asyncio.sleep(random.uniform(2, 4))
             field = await self.page.query_selector(selector)
             await self.scroll_to_element(field)
             if isinstance(value_for_fill, list):
@@ -225,7 +217,7 @@ class ParserConstructor:
         Указать селектор (тот же что в кнопке), чтобы записать дату записи в файл (НО БЕЗ # . ИЛИ ПРОЧЕГО, ПРОСТО ИМЯ)
         name - указать любое значение, которое вам удобно, чтобы ориентироваться в файле
         '''
-        await asyncio.sleep(random.uniform(1, 2))
+        await asyncio.sleep(random.uniform(2, 4))
         record_time = await (await self.page.query_selector(f"[for='{selector}']")).inner_text()
         data = {name: record_time.replace("\n", ' ')}
         await self.save_to_file(data)
@@ -263,15 +255,32 @@ class ParserConstructor:
                 "args": [ 
                     "--ignore-certificate-errors",
                     "--allow-insecure-localhost", 
-                    r"--client-certificate=D:\_.programming\SPAIN_PARSER\cert\cert.crt"
-                    r"--client-key=D:\_.programming\SPAIN_PARSER\cert\private.key"
-                    ]
+                    r"--client-certificate=D:\_.programming\SPAIN_PARSER\cert\cert.crt",
+                    r"--client-key=D:\_.programming\SPAIN_PARSER\cert\private.key",
+                    '--disable-blink-features=AutomationControlled', 
+                    '--no-sandbox',  
+                    '--disable-infobars', 
+                ]
             }
 
+            # headers = {
+            #     "Accept-Language": "es-ES,es;q=0.9",
+            #     "Connection": "keep-alive",
+            #     "Accept-Encoding": "gzip, deflate, br",
+            #     "Connection": "keep-alive",
+            #     "Upgrade-Insecure-Requests": "1",
+            # }
             headers = {
-                "Accept-Language": "es-ES,es;q=0.9",
-                "Connection": "keep-alive",
-                "Accept-Encoding": "gzip, deflate"
+                "accept": "*/*",
+                "accept-encoding": "gzip, deflate, br, zstd",
+                "accept-language": "ru,en;q=0.9,en-GB;q=0.8,en-US;q=0.7",
+                "connection": "keep-alive",
+                "sec-ch-ua": '"Chromium";v="130", "Microsoft Edge";v="130", "Not?A_Brand";v="99"',
+                "sec-ch-ua-mobile": "?0",
+                "sec-ch-ua-platform": '"Windows"',
+                "sec-fetch-dest": "script",
+                "sec-fetch-mode": "no-cors",
+                "sec-fetch-site": "same-origin",
             }
 
             if self.host:
@@ -284,8 +293,12 @@ class ParserConstructor:
             self.browser = await self.playwright.chromium.launch(**browser_options)
             self.context = await self.browser.new_context(
                 user_agent=self.ua.random, 
-                extra_http_headers=headers)
+                java_script_enabled=True,
+                viewport={'width': 1366, 'height': 768}
+            )
             self.page = await self.context.new_page()
+            # await stealth_async(self.page)
+            self.context.on('route', self.modify_headers)
             self.page.set_default_timeout(15000)
             await self.page.goto(url)
         except Exception as e:
