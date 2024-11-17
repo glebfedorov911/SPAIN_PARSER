@@ -212,7 +212,9 @@ class ParserConstructor:
         name - указать любое значение, которое вам удобно, чтобы ориентироваться в файле
         '''
         await asyncio.sleep(random.uniform(1, 2))
-        record_time = await (await self.page.query_selector(f"[for='{selector}']")).inner_text()
+        if "#" not in selector or '.' not in selector:
+            selector = f"[for='{selector}']"
+        record_time = await (await self.page.query_selector(selector)).inner_text()
         data = {name: record_time.replace("\n", ' ')}
         await self.save_to_file(data)
         print("Данные успешно сохранены в файл")
