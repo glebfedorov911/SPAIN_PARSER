@@ -84,8 +84,9 @@ class ParserConstructor:
         _id - если у кнопок одинаковые айди/классы, то нужно указать ее номер по счету (НАПРИМЕР КНОПКА ГДЕ ВЫБОР ЭЛЕКТРОННОЙ ПОДПИСИ - ОНА ВТОРАЯ, УКАЗЫВАЕМ 2)
         '''
         try:
+            await self.reload_if_reject()
             await self.page.wait_for_selector(selector)
-            await asyncio.sleep(random.uniform(2, 4))
+            await asyncio.sleep(random.uniform(1, 2))
             buttons = await self.page.query_selector_all(selector)
             button = buttons[-1] if not _id else buttons[int(_id)-1]
             await self.scroll_to_element(button)
@@ -105,8 +106,9 @@ class ParserConstructor:
         (оставить пустым, если выбор на странице один)
         '''
         try:
+            await self.reload_if_reject()
             await self.page.wait_for_selector(form_selector)
-            await asyncio.sleep(random.uniform(2, 4))            
+            await asyncio.sleep(random.uniform(1, 2))            
             form = (await self.page.query_selector_all(form_selector))[int(idx)-1]
             await self.scroll_to_element(form)
             await form.click()
@@ -117,7 +119,7 @@ class ParserConstructor:
 
             for option in options:
                 if option_value in await option.get_attribute("value") or option_value in await option.inner_text():
-                    await asyncio.sleep(random.uniform(1, 2))
+                    await asyncio.sleep(random.uniform(.5, 1))
                     await form.select_option(await option.get_attribute("value"))
                     print("Успешно выбрали поле в форме!!")
                     break
@@ -169,8 +171,9 @@ class ParserConstructor:
         value_for_fill - значение для заполнения поля
         '''
         try:
+            await self.reload_if_reject()
             await self.page.wait_for_selector(selector)
-            await asyncio.sleep(random.uniform(2, 4))
+            await asyncio.sleep(random.uniform(1, 2))
             field = await self.page.query_selector(selector)
             await self.scroll_to_element(field)
             if isinstance(value_for_fill, list):
@@ -208,7 +211,7 @@ class ParserConstructor:
         Указать селектор (тот же что в кнопке), чтобы записать дату записи в файл (НО БЕЗ # . ИЛИ ПРОЧЕГО, ПРОСТО ИМЯ)
         name - указать любое значение, которое вам удобно, чтобы ориентироваться в файле
         '''
-        await asyncio.sleep(random.uniform(2, 4))
+        await asyncio.sleep(random.uniform(1, 2))
         record_time = await (await self.page.query_selector(f"[for='{selector}']")).inner_text()
         data = {name: record_time.replace("\n", ' ')}
         await self.save_to_file(data)
@@ -249,22 +252,24 @@ class ParserConstructor:
                     r"--client-certificate=D:\_.programming\SPAIN_PARSER\cert\cert.crt",
                     r"--client-key=D:\_.programming\SPAIN_PARSER\cert\private.key",
                     '--disable-blink-features=AutomationControlled', 
+                    '--disable-extensions',  
+                    '--disable-dev-shm-usage',  
+                    '--remote-debugging-port=0',  
+                    '--disable-popup-blocking',  
+                    '--incognito', 
+                    '--disable-web-security',  
+                    '--start-maximized',  
                     '--no-sandbox',  
                     '--disable-infobars', 
                 ]
             }
 
             headers = {
-                "accept": "*/*",
-                "accept-encoding": "gzip, deflate, br, zstd",
-                "accept-language": "ru,en;q=0.9,en-GB;q=0.8,en-US;q=0.7",
-                "connection": "keep-alive",
-                "sec-ch-ua": '"Chromium";v="130", "Microsoft Edge";v="130", "Not?A_Brand";v="99"',
-                "sec-ch-ua-mobile": "?0",
-                "sec-ch-ua-platform": '"Windows"',
-                "sec-fetch-dest": "script",
-                "sec-fetch-mode": "no-cors",
-                "sec-fetch-site": "same-origin",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8",
+                "Accept-Encoding": "gzip, deflate, br",
+                "Accept-Language": "en-US,en;q=0.9",
+                "Connection": "keep-alive",
+                "Cache-Control": "max-age=0",
             }
 
             if self.host:
@@ -282,7 +287,12 @@ class ParserConstructor:
             )
             self.page = await self.context.new_page()
             self.context.on('route', self.modify_headers)
+            await self.context.add_init_script("""
+                Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3] });
+                Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
+            """)
             self.page.set_default_timeout(15000)
+            await self.page.evaluate("() => { delete navigator.__proto__.webdriver; }")
             await self.page.goto(url)
         except Exception as e:
             await self.handle_error("Ошибка при запуске браузера или переходе на страницу", e)
@@ -320,6 +330,14 @@ class ParserConstructor:
         image = Image.open(BytesIO(captcha_image))
         image.save(image_path, "PNG")
         return image_path
+
+    async def reload_if_reject(self):
+        await self.page.wait_for_selector("body")
+        body = await self.page.query_selector("body")
+        if "The requested URL was rejected. Please consult with your administrador." in await body.inner_text():
+            for _ in range(2):
+                await self.page.reload()
+
 
     @staticmethod
     def captcha_text(path):
