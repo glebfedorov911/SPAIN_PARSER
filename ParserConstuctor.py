@@ -335,7 +335,7 @@ class ParserConstructor:
     async def reload_if_reject(self):
         await self.page.wait_for_selector("body")
         body = await self.page.query_selector("body")
-        if "The requested URL was rejected. Please consult with your administrador." in await body.inner_text():
+        if "The requested URL was rejected. Please consult with your administrador." in await body.inner_text() or " " == await body.inner_text():
             for _ in range(2):
                 await self.page.reload()
 

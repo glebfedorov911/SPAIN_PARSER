@@ -1,0 +1,34 @@
+{
+    "0": 
+    {
+        "0": ["Запустить парсер", "https://sede.administracionespublicas.gob.es/pagina/index/directorio/icpplus"],
+        "1": ["Нажать кнопку", ".uppercase.button_next"],
+        "2": ["Выбрать значение", "Valencia", "#form"],
+        "3": ["Нажать кнопку", "#btnAceptar"],
+        "5": ["Выбрать значение", "POLICIA-CARTA DE INVITACIÓN", ".mf-input__l", ".mf-input__l","1"],
+        "6": ["Нажать кнопку", "#btnAceptar"],
+        "7": ["Нажать кнопку", "#btnEntrar"],
+        "8": ["Нажать кнопку", "#rdbTipoDocNie"],
+        "9": ["Заполнить поле", "Y5008703F", "#txtIdCitado"],
+        "10": ["Заполнить поле", "VITALII PANFILOV", "#txtDesCitado"],
+        "11": ["Нажать кнопку", "#btnEnviar"],
+        "12": ["Нажать кнопку", "#btnEnviar"],
+        "13": ["Выбрать значение", "CNP COMISARIA DE BURJASOT, C/  Doctor Joan Pesset , 2, Burjassot", ".mf-input__xl", ".mf-input__xl","1"],
+        "14": ["Нажать кнопку", "#btnSiguiente"],
+        "15": ["Заполнить поле", "612345658", ".cajapeque"],
+        "16": ["Заполнить поле", "612345658a@gmail.com", "#emailUNO"],
+        "17": ["Заполнить поле", "612345658a@gmail.com", "#emailDOS"],
+        "18": ["Нажать кнопку", "#btnSiguiente"],
+        "19": ["Нажать кнопку", "#cita1"],
+        "20": ["Записать дату", "cita1", "VITALII PANFILOV | 612345658 | 612345658a@gmail.com"],
+        "21": ["Решить капчу"],
+        "22": ["Прислать уведомление", "1"],
+        "23": ["Нажать кнопку", "#btnSiguiente"],
+        "24": ["Нажать кнопку", "body > div.jconfirm.jconfirm-light.jconfirm-open > div.jconfirm-scrollpane > div > div > div > div > div > div > div > div.jconfirm-buttons > button:nth-child(1)"],
+        "25": ["Нажать кнопку", "#chkTotal"],
+        "26": ["Нажать кнопку", "#enviarCorreo"],
+        "27": ["Поставить задержку", "60"],
+        "28": ["Нажать кнопку", "#btnConfirmar"],
+        "29": ["Нажать кнопку", "#btnSalir"]
+    }
+}
