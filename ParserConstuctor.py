@@ -177,9 +177,8 @@ class ParserConstructor:
             field = await self.page.query_selector(selector)
             await self.scroll_to_element(field)
             if isinstance(value_for_fill, list):
-                await field.fill(value_for_fill[int(idx)])
-            else:
-                await field.fill(value_for_fill)
+                value_for_fill = value_for_fill[int(idx)]
+            await field.fill(value_for_fill)
             print("Поле успешно заполенено")
         except TimeoutError as te:
             await self.handle_error("Ошибка! Превышено время ожидания прогрузки страницы!")
@@ -206,15 +205,15 @@ class ParserConstructor:
         await asyncio.sleep(int(time_to_finish))
         print(f"Время вышло")
 
-    async def save_time_record(self, selector, name):
+    async def save_time_record(self, selector, name, idx = None):
         '''
-        Указать селектор (тот же что в кнопке), чтобы записать дату записи в файл (НО БЕЗ # . ИЛИ ПРОЧЕГО, ПРОСТО ИМЯ)
+        Указать селектор (нажать на элемент правой кнопкой мыши copy > copy selector)
         name - указать любое значение, которое вам удобно, чтобы ориентироваться в файле
         '''
         await asyncio.sleep(random.uniform(1, 2))
-        if "#" not in selector or '.' not in selector:
-            selector = f"[for='{selector}']"
         record_time = await (await self.page.query_selector(selector)).inner_text()
+        if isinstance(name, list):
+            name = name[idx]
         data = {name: record_time.replace("\n", ' ')}
         await self.save_to_file(data)
         print("Данные успешно сохранены в файл")

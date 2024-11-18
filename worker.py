@@ -31,7 +31,7 @@ async def parser_worker(delay: int, n: int, queue: asyncio.Queue):
                 args = data[1:]
                 if data[0] in commands:
                     arguments = list(args)
-                    if data[0] == "Заполнить поле":
+                    if data[0] == "Заполнить поле" or data[0] == "Записать дату":
                         if number_of_validate_data >= len(args[0]):
                             number_of_validate_data = 0
                         arguments.append(number_of_validate_data)
