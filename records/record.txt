@@ -3,3 +3,6 @@
 {'Vitalii': 'CITA 1 Día: 21/11/2024 Hora: 18:15 '}
 {'Vitalii': 'CITA 1 Día: 21/11/2024 Hora: 18:15 '}
 {'Vitalii': 'CITA 1 Día: 21/11/2024 Hora: 19:00 '}
+{'VITALII PANFILOV | 612345658 | 612345658a@gmail.com': 'CITA 1 Día: 20/11/2024 Hora: 11:40 '}
+{'VITALII PANFILOV | 612345658 | 612345658a@gmail.com': 'CITA 1 Día: 20/11/2024 Hora: 11:20 '}
+{'VITALII PANFILOV | 612345658 | 612345658a@gmail.com': 'CITA 1 Día: 20/11/2024 Hora: 12:00 '}

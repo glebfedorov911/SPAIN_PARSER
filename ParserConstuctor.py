@@ -84,7 +84,7 @@ class ParserConstructor:
         _id - если у кнопок одинаковые айди/классы, то нужно указать ее номер по счету (НАПРИМЕР КНОПКА ГДЕ ВЫБОР ЭЛЕКТРОННОЙ ПОДПИСИ - ОНА ВТОРАЯ, УКАЗЫВАЕМ 2)
         '''
         try:
-            await self.reload_if_reject()
+            # await self.reload_if_reject()
             await self.page.wait_for_selector(selector)
             await asyncio.sleep(random.uniform(1, 2))
             buttons = await self.page.query_selector_all(selector)
@@ -106,7 +106,7 @@ class ParserConstructor:
         (оставить пустым, если выбор на странице один)
         '''
         try:
-            await self.reload_if_reject()
+            # await self.reload_if_reject()
             await self.page.wait_for_selector(form_selector)
             await asyncio.sleep(random.uniform(1, 2))            
             form = (await self.page.query_selector_all(form_selector))[int(idx)-1]
@@ -171,7 +171,7 @@ class ParserConstructor:
         value_for_fill - значение для заполнения поля
         '''
         try:
-            await self.reload_if_reject()
+            # await self.reload_if_reject()
             await self.page.wait_for_selector(selector)
             await asyncio.sleep(random.uniform(1, 2))
             field = await self.page.query_selector(selector)
@@ -335,7 +335,7 @@ class ParserConstructor:
     async def reload_if_reject(self):
         await self.page.wait_for_selector("body")
         body = await self.page.query_selector("body")
-        if "The requested URL was rejected. Please consult with your administrador." in await body.inner_text() or " " == await body.inner_text():
+        if "The requested URL was rejected. Please consult with your administrador." in await body.inner_text() or "" == await body.inner_text():
             for _ in range(2):
                 await self.page.reload()
 

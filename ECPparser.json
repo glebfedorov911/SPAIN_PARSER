@@ -20,7 +20,7 @@
         "17": ["Заполнить поле", "612345658a@gmail.com", "#emailDOS"],
         "18": ["Нажать кнопку", "#btnSiguiente"],
         "19": ["Нажать кнопку", "#cita1"],
-        "20": ["Записать дату", "cita1", "VITALII PANFILOV | 612345658 | 612345658a@gmail.com"],
+        "20": ["Записать дату", "#lCita_1", "VITALII PANFILOV | 612345658 | 612345658a@gmail.com"],
         "21": ["Прислать уведомление", "1"],
         "22": ["Нажать кнопку", "#btnSiguiente"],
         "23": ["Нажать кнопку", "body > div.jconfirm.jconfirm-light.jconfirm-open > div.jconfirm-scrollpane > div > div > div > div > div > div > div > div.jconfirm-buttons > button:nth-child(1)"],
