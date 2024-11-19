@@ -32,5 +32,5 @@ async def start(filename):
     await parser(host=host, port=port, login=login, password=password, worker_data=worker_data)
 
 if __name__ == "__main__":
-    filename = "CAPTCHAparser.json"
+    filename = "ECPparser.json"
     asyncio.run(start(filename))
