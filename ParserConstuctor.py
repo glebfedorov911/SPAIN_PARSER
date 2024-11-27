@@ -290,7 +290,6 @@ class ParserConstructor:
             self.context = await self.browser.new_context(
                 user_agent=random.choice(self.user_agents), 
                 java_script_enabled=True,
-                viewport={'width': 1366, 'height': 768}
             )
             self.page = await self.context.new_page()
             await self.page.set_viewport_size({"width": window_width, "height": window_height})
