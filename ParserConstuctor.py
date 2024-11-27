@@ -15,6 +15,7 @@ from io import BytesIO
 from pywinauto import Application
 
 from playwright.async_api import async_playwright, TimeoutError
+from playwright_stealth import stealth_async
 
 from datetime import datetime
 
@@ -239,11 +240,15 @@ class ParserConstructor:
         os.remove(image_path)
         print("Капча разгадана и записана")
 
-    async def start(self, url):
+    async def start(self, url, x_position=0):
         '''
         Перед написанием всей программы запускаем этот метод, для открытия эмулятора веб версии
         '''
         try:
+            window_width = 620
+            window_height = 952
+            y_position = 0 
+
             self.playwright = await async_playwright().start()
             browser_options = {
                 "headless": self.headless,
@@ -262,6 +267,7 @@ class ParserConstructor:
                     '--start-maximized',  
                     '--no-sandbox',  
                     '--disable-infobars', 
+                    f"--window-position={x_position},{y_position}",
                 ]
             }
 
@@ -287,11 +293,13 @@ class ParserConstructor:
                 viewport={'width': 1366, 'height': 768}
             )
             self.page = await self.context.new_page()
+            await self.page.set_viewport_size({"width": window_width, "height": window_height})
             self.context.on('route', self.modify_headers)
             await self.context.add_init_script("""
                 Object.defineProperty(navigator, 'plugins', { get: () => [1, 2, 3] });
                 Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
             """)
+            # await stealth_async(self.page)
             self.page.set_default_timeout(15000)
             await self.page.evaluate("() => { delete navigator.__proto__.webdriver; }")
             await self.page.goto(url)
