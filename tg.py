@@ -18,17 +18,24 @@ start_parser = False
 @client.on(events.NewMessage(chats='check_cita_bot')) 
 async def handler(event):
     global start_parser
-    msg = event.message.text
+    msg = create_replacer(event.message.text)
     data = await read_json()
-    if msg in data and not start_parser:
+    if not start_parser:
         start_parser = True
         print("Парсер успешно запущен")
-        await start(data[msg])
+        await start("parsertest.json", msg)
         start_parser = False
         print("Парсер закончил работу")
     else:
         print("Парсер уже запущен/нет такого сообщения в конфигурационном файле")
-        
+    
+def create_replacer(message):
+    cut_message = message.split("\n")
+    return {
+        "PROVINCIA": solve[2].split(":")[1][1:],
+        "OFICINAS": solve[5][1:],
+        "SERVISIO": solve[7][1:]
+    }
 
 async def main():
     while True:

@@ -3,7 +3,7 @@ import asyncio
 from ParserConstuctor import ParserConstructor
 
 
-async def parser_worker(delay: int, n: int, queue: asyncio.Queue):
+async def parser_worker(delay: int, n: int, queue: asyncio.Queue, msg=None):
     print(f"до запуска {n} воркера осталось {delay} секунд")
     await asyncio.sleep(delay=delay)
     number_of_validate_data = 0
@@ -31,6 +31,9 @@ async def parser_worker(delay: int, n: int, queue: asyncio.Queue):
                 args = data[1:]
                 if data[0] in commands:
                     arguments = list(args)
+                    information = arguments[0].split("_")
+                    if len(information) >= 2 and information[1] == "PLACE":
+                        arguments[0] = msg[information[0]]
                     if data[0] == "Заполнить поле" or data[0] == "Записать дату":
                         if number_of_validate_data >= len(args[0]):
                             number_of_validate_data = 0

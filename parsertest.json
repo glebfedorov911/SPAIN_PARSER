@@ -1,12 +1,11 @@
 {
     "0": 
     {
-        "0": ["Запустить парсер", "https://sede.administracionespublicas.gob.es/pagina/index/directorio/icpplus", "630"],
+        "0": ["Запустить парсер", "https://sede.administracionespublicas.gob.es/pagina/index/directorio/icpplus", "0"],
         "1": ["Нажать кнопку", ".uppercase.button_next"],
         "2": ["Выбрать значение", "PROVINCIA_PLACE", "#form"],
         "3": ["Нажать кнопку", "#btnAceptar"],
-        "13": ["Выбрать значение", "OFICINAS_PLACE", ".mf-input__xl", ".mf-input__xl","1"],
-        "5": ["Выбрать значение", "SERVISIO_PLACE", ".mf-input__l", ".mf-input__l", "1"],
+        "5": ["Выбрать значение", "OFICINAS_PLACE", ".mf-input__l", ".mf-input__l","1"],
         "6": ["Нажать кнопку", "#btnAceptar"],
         "7": ["Нажать кнопку", "#btnAccesoClave"],
         "8": ["Нажать кнопку", ".idp-button", "2"],
@@ -14,6 +13,7 @@
         "10": ["Нажать кнопку", "#btnCopiar"],
         "11": ["Нажать кнопку", "#btnEnviar"],
         "12": ["Нажать кнопку", "#btnEnviar"],
+        "13": ["Выбрать значение", "CNP COMISARIA DE BURJASOT, C/  Doctor Joan Pesset , 2, Burjassot", ".mf-input__xl", ".mf-input__xl","1"],
         "14": ["Нажать кнопку", "#btnSiguiente"],
         "15": ["Заполнить поле", "612345658", ".cajapeque"],
         "16": ["Заполнить поле", "612345658a@gmail.com", "#emailUNO"],
