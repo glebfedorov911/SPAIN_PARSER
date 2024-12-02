@@ -301,6 +301,13 @@ class ParserConstructor:
             # await stealth_async(self.page)
             self.page.set_default_timeout(15000)
             await self.page.evaluate("() => { delete navigator.__proto__.webdriver; }")
+            async def route_handler(route, request):
+                if request.resource_type in ["image", "stylesheet", "font"]:
+                    await route.abort()  
+                else:
+                    await route.continue_() 
+
+            await self.page.route("**/*", route_handler)
             await self.page.goto(url)
         except Exception as e:
             await self.handle_error("Ошибка при запуске браузера или переходе на страницу", e)
