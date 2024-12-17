@@ -2,14 +2,17 @@ import asyncio
 
 from ParserConstuctor import ParserConstructor
 
+finished = []
 
 async def parser_worker(delay: int, n: int, queue: asyncio.Queue, msg=None):
+    global finished
+    finished = []
     print(f"до запуска {n} воркера осталось {delay} секунд")
     await asyncio.sleep(delay=delay)
     number_of_validate_data = 0
     while True:
         print("Цикл запущен")
-        host, port, login, password, worker_data = await queue.get()
+        host, port, login, password, worker_data, index_finish = await queue.get()
         pc = ParserConstructor(host=host, port=port, login=login, password=password)
 
         commands = {
@@ -27,6 +30,10 @@ async def parser_worker(delay: int, n: int, queue: asyncio.Queue, msg=None):
 
         try:
             for index_page_data in worker_data:
+                if index_finish in finished:
+                    print("Завершил досрочно")
+                    await pc.finish()
+                    break
                 data = worker_data[index_page_data]
                 args = data[1:]
                 if data[0] in commands:
@@ -51,3 +58,4 @@ async def parser_worker(delay: int, n: int, queue: asyncio.Queue, msg=None):
         finally:
             number_of_validate_data += 1
             queue.task_done()
+            finished.append(index_finish)

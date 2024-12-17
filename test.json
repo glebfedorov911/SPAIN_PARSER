@@ -2,16 +2,9 @@
     "0": 
     {
         "0": ["Запустить парсер", "https://sede.administracionespublicas.gob.es/pagina/index/directorio/icpplus", "0"],
-        "1": ["Поставить задержку", "5000"]
-    },
-    "1":
-    {
-        "0": ["Запустить парсер", "https://sede.administracionespublicas.gob.es/pagina/index/directorio/icpplus", "630"],
-        "1": ["Поставить задержку", "5000"]
-    },
-    "2":
-    {
-        "0": ["Запустить парсер", "https://sede.administracionespublicas.gob.es/pagina/index/directorio/icpplus", "1250"],
-        "1": ["Поставить задержку", "5000"]
+        "4": ["Поставить задержку", "2"],
+        "1": ["Нажать кнопку", ".uppercase.button_next"],
+        "2": ["Поставить задержку", "2"]
     }
 }
+
